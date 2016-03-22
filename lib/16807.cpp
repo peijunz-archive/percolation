@@ -3,7 +3,6 @@
 #define M 2147483647    //2^31-1
 #define A 16807         //16807产生器
 
-
 double myrand(int init=0){
     /*init>0, use thae value to initialize seed
               =0, continue
