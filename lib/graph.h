@@ -1,14 +1,26 @@
 #ifndef GRAPH_H
 #define GRAPH_H
-typedef char corrtype;
+
+#define BOND true
+#define SITE false
+
+typedef unsigned char corrtype;
+
 struct torus{
     ndarray site;
     ndarray *bond;
 };
-void inittorus(torus &t, int dim, int width);//OK
+
+void inittorus(torus &t, int dim, int width, int type=BOND);//OK
+
 void destroytorus(torus &t);
-void setbond(torus &t, double prob=0.5);//OK
-void setsite(torus &t, double prob=0.5);//OK
+
+void setbond(torus &t, double prob);
+
+void setsite(torus &t, double prob);
+
 void wrapping(torus &t);
+
 void printtorus(torus &t);//OK
+
 #endif // GRAPH_H

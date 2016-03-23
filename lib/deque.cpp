@@ -1,20 +1,23 @@
 #include "ndarray.h"
 #include <stdio.h>
 #include <stdlib.h>
+
 typedef int elemtype;//save raw index
+
 struct node;
 typedef node* link;
-
 struct node{
     elemtype elem;
     link next;
     link before;
 };
+
 struct quene{
     int length;
     link tail;
     link head;
 };
+
 elemtype pop(quene &q){
     elemtype elem;
     link tmp=NULL;
@@ -31,18 +34,16 @@ elemtype pop(quene &q){
     q.length--;
     return elem;
 }
-elemtype popleft(quene &q){
-    //Copy of pop
+
+elemtype popleft(quene &q){//Copy of pop(), just replace head<-->tail, before<-->next
     elemtype elem;
     link tmp=NULL;
-//    printf("%d\n",q.tail);
     if(q.length==0)
         exit;
     if (q.length==1)
         q.head=NULL;
     elem=q.tail->elem;
     tmp=q.tail;
-//    printf("%d\n",tmp->before);
     q.tail=tmp->before;
     free(tmp);
     if (q.length!=1)
@@ -50,11 +51,13 @@ elemtype popleft(quene &q){
     q.length--;
     return elem;
 }
+
 void initq(quene &q){
     q.length=0;
     q.tail=NULL;
     q.head=NULL;
 }
+
 void append(quene &q, elemtype &elem){
     link p=NULL;
     p=(link)malloc(sizeof(node));

@@ -6,17 +6,23 @@
 #include "lib/deque.h"
 
 int main(){
-//    torus t;
-    double a;
-    int i=0;
-    unsigned char c=250;//Use unsigned char to save coordinate
+    torus t;
+//    int i=0,ax=0;
+//    unsigned char c=250;//Use unsigned char to save coordinate
     quene q;
     initq(q);
     myrand(INIT_RANDOM);
-//    inittorus(t, 2, 5);
-//    setbond(t,0.6);
+    inittorus(t, 2, 100, SITE);
+    setsite(t,0.59);
 //    printtorus(t);
-//    destroytorus(t);
-    printf("%d\n",c);
+//    for(axs=0;ax<t.site.dim;ax++){
+//        setmem(zone[i],t.site.dim, t.site.shape);
+//        printf("main\n");
+//        init(zone[i]);//init zone to 0
+//        printarr(zone[i]);
+//    }
+    wrapping(t);
+    destroytorus(t);
+//    printf("%d\n",c);
     return 0;
 }
