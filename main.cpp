@@ -12,7 +12,9 @@ int main(){
     quene q;
     initq(q);
     myrand(INIT_RANDOM);
-    inittorus(t, 2, 100, SITE);
+//    inittorus(t, 2, 10000, BOND);
+//    setbond(t,0.5);
+    inittorus(t, 2, 10000, SITE);
     setsite(t,0.59);
 //    printtorus(t);
 //    for(axs=0;ax<t.site.dim;ax++){
