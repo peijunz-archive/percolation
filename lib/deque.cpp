@@ -4,72 +4,76 @@
 
 typedef int elemtype;//save raw index
 
-struct node;
+class node;
 typedef node* link;
-struct node{
+class node{
+public:
     elemtype elem;
     link next;
     link before;
+    node():next(NULL), before(NULL){}
 };
 
-struct quene{
+class quene{
+public:
     int length;
     link tail;
     link head;
+    quene():length(0),tail(NULL),head(NULL){}
+    ~quene();
+    elemtype pop();
+    elemtype popleft();
+    void append(elemtype elem);
 };
+quene::~quene(){
+    while(length>0){
+        pop();
+    }
+}
 
-elemtype pop(quene &q){
+elemtype quene::pop(){
     elemtype elem;
     link tmp=NULL;
-    if(q.length==0)
+    if(length==0)
         exit;
-    if (q.length==1)
-        q.tail=NULL;
-    elem=q.head->elem;
-    tmp=q.head;
-    q.head=tmp->next;
-    free(tmp);
-    if (q.length!=1)
-        q.head->before=NULL;
-    q.length--;
+    if (length==1)
+        tail=NULL;
+    elem=head->elem;
+    tmp=head;
+    head=tmp->next;
+    delete tmp;
+    if (length!=1)
+        head->before=NULL;
+    length--;
     return elem;
 }
 
-elemtype popleft(quene &q){//Copy of pop(), just replace head<-->tail, before<-->next
+elemtype quene::popleft(){//Copy of pop(), just replace head<-->tail, before<-->next
     elemtype elem;
     link tmp=NULL;
-    if(q.length==0)
+    if(length==0)
         exit;
-    if (q.length==1)
-        q.head=NULL;
-    elem=q.tail->elem;
-    tmp=q.tail;
-    q.tail=tmp->before;
-    free(tmp);
-    if (q.length!=1)
-        q.tail->next=NULL;
-    q.length--;
+    if (length==1)
+        head=NULL;
+    elem=tail->elem;
+    tmp=tail;
+    tail=tmp->before;
+    delete tmp;
+    if (length!=1)
+        tail->next=NULL;
+    length--;
     return elem;
 }
 
-void initq(quene &q){
-    q.length=0;
-    q.tail=NULL;
-    q.head=NULL;
-}
-
-void append(quene &q, elemtype &elem){
-    link p=NULL;
-    p=(link)malloc(sizeof(node));
+void quene::append(elemtype elem){
+    link p=new node;
     p->elem=elem;
-    if (q.head==0){
-        p->before=NULL;
-        p->next=NULL;
-        q.head=q.tail=p;
+    if (head==0){
+        head=tail=p;
     }
     else{
-        p->next=q.head;
-        q.head=q.head->before=p;
+        p->next=head;
+        head=head->before=p;
     }
-    q.length++;
+    length++;
 }
