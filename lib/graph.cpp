@@ -14,126 +14,102 @@
 #define INQUENE -1
 #define POPOUT -2
 
-typedef unsigned char corrtype;
-
-struct torus{
+class torus{
+    bool type;
+public:
     ndarray site;
     ndarray *bond;
-    bool type;
+    torus(int dim, int width, double prob, int tp);
+    ~torus();
+    void print();
+    void wrapping();
 };
 
-void inittorus(torus &t, int dim, int width, int type=BOND){
-    int shape[dim],ax;
-    for(int ax=0;ax<dim;ax++){
-        shape[ax]=width;
-    }
-    setmem(t.site,dim,shape);
-    if(type==BOND){
-        t.bond=(ndarray *)malloc(sizeof(ndarray)*dim);
-        for(ax=0;ax<dim;ax++)
-            setmem(t.bond[ax],dim,shape);
-        t.type=BOND;
+torus::torus(int dim, int width, double prob, int tp):site(dim,width), type(tp){
+    int ax, i, near;
+    if(tp==SITE){
+        bond=NULL;
+        randomize(site,prob);
     }
     else{
-        t.type=SITE;
-        t.bond=NULL;
-    }
-}
-
-void destroytorus(torus &t){
-    int ax;
-    destroy(t.site);
-    if(t.type==BOND){
-        for(ax=0;ax<t.site.dim;ax++)
-            destroy(t.bond[ax]);
-        free(t.bond);
-    }
-}
-
-void setbond(torus &t, double prob){
-    int ax, i, hehe=0,near;
-    if(t.type==SITE){
-        printf("setbond(): TYPE ERROR for BOND PERCOLATION!\n");
-        exit;
-    }
-    for(ax=0;ax<t.site.dim;ax++){
-        place(t.bond[ax],prob);
-    }
-    init(t.site);
-    for(i=0;i<t.site.stride[0];i++){
-        for(ax=0;ax<t.site.dim;ax++){
-            if(t.bond[ax].head[i]){
-                near=rollindex(t.bond[ax],i,ax,hehe);
-                t.site.head[near]+=1;
-                t.site.head[i]+=1;
+        bond=new ndarray[dim];
+        for(ax=0;ax<site.dim;ax++){
+            bond[ax].reset(dim,width);
+            randomize(bond[ax],prob);
+        }
+        homogenize(site);
+        for(i=0;i<site.stride[0];i++){
+            for(ax=0;ax<site.dim;ax++){
+                if(bond[ax].head[i]){
+                    near=bond[ax].rollindex(i,ax);
+                    site.head[near]+=1;
+                    site.head[i]+=1;
+                }
             }
         }
     }
 }
 
-void setsite(torus &t, double prob){
-    int ax,i;
-    if(t.type==SITE)
-        place(t.site,prob);
-    else{
-        printf("setsite(): TYPE ERROR for SITE PERCOLATION!\n");
-        exit;
-    }
+torus::~torus(){
+    if(type==BOND)
+        delete [] bond;
 }
 
-void printtorus(torus &t){
+void torus::print(){
     printf("%sSite:\n%s",LINE,LINE);
-    printarr(t.site);
-    if(t.type==SITE)
+    site.print();
+    if(type==SITE)
         return;
-    for(int i=0;i<t.site.dim;i++){
+    for(int i=0;i<site.dim;i++){
         printf("%sBond in axis %d\n%s", LINE, i, LINE);
-        printarr(t.bond[i]);
+        bond[i].print();
     }
 }
 
-void wrapping(torus &t){
+void torus::wrapping(){
     quene q;
-    initq(q);
-    ndarray zone[t.site.dim];
-    int delta, wrap[t.site.dim];
+    ndarray zone[site.dim];
+    int delta, wrap[site.dim];
     int i, point=0,near=0, wrapcount, path, ax, absax, tmpax;
-    for(ax=0;ax<t.site.dim;ax++){
-        setmem(zone[ax],t.site.dim, t.site.shape);
-        init(zone[ax]);//init zone to 0
+    for(ax=0;ax<site.dim;ax++){
+        zone[ax].reset(site.dim, site.shape);
+        homogenize(zone[ax]);//init zone to 0
+//        zone[ax].print();
     }
-    for(i=0;i<t.site.stride[0];i++){
-        if (t.site.head[i]>0){//unvisited site
-            for(ax=0;ax<t.site.dim;ax++){//初始化起点的区为{0,0,...,0}
+    for(i=0;i<site.stride[0];i++){
+        if (site.head[i]>0){//unvisited site
+            for(ax=0;ax<site.dim;ax++){//初始化起点的区为{0,0,...,0}
                 zone[ax].head[i]=0;//init to 0
                 wrap[ax]=0;
             }
             wrapcount=0;//记录有几个方向wrap
-            append(q,i);
+            q.append(i);
 //            printf("%sNew cluster:\n%s",LINE,LINE);
             while(q.length>0){
-                point=popleft(q);
+                point=q.popleft();
 //                printf("%4d",point);
-                t.site.head[point]=POPOUT;
-                for(ax=-t.site.dim;ax<t.site.dim;ax++){
-                    near=rollindex(t.site,point,ax,delta);
+                site.head[point]=POPOUT;
+                for(ax=-site.dim;ax<site.dim;ax++){
+                    near=site.rollindex(point,ax);// TODO delta
                     absax=(ax>=0)?ax:(-1-ax);
-                    if(t.type==SITE) path=t.site.head[near];
+                    if((2*ax+1)*(near-i)<0) delta=(ax>=0)?1:-1;
+                    else delta=0;
+                    if(type==SITE) path=site.head[near];
                     else{//bond
-                        if(ax>=0) path=t.bond[absax].head[point];
-                        else path=t.bond[absax].head[near];
+                        if(ax>=0) path=bond[absax].head[point];
+                        else path=bond[absax].head[near];
                     }
                     if(path){
-                        if (t.site.head[near]>0){
-                            for(tmpax=0;tmpax<t.site.dim;tmpax++)
+                        if (site.head[near]>0){
+                            for(tmpax=0;tmpax<site.dim;tmpax++)
                                 zone[tmpax].head[near]=zone[tmpax].head[point];
                             zone[absax].head[near]+=delta;
-                            append(q,near);
-                            t.site.head[near]=INQUENE;
+                            q.append(near);
+                            site.head[near]=INQUENE;
                         }
-                        else if(t.site.head[near]==INQUENE){
-                            zone[absax].head[point]+=delta;//for comparation, will cancel it soon
-                            for(int tmpax=0;tmpax<t.site.dim;tmpax++){
+                        else if(site.head[near]==INQUENE){
+                            zone[absax].head[point]+=delta;//will cancel it soon
+                            for(int tmpax=0;tmpax<site.dim;tmpax++){
                                 if(wrap[tmpax]) continue;
                                 if(zone[tmpax].head[near] != zone[tmpax].head[point]){
                                     wrap[tmpax]=1;
@@ -148,13 +124,10 @@ void wrapping(torus &t){
 //            putchar('\n');
             if(wrapcount>0){
                 printf("Wrapping Status: ");
-                for(tmpax=0;tmpax<t.site.dim;tmpax++)
+                for(tmpax=0;tmpax<site.dim;tmpax++)
                     printf("%d ",wrap[tmpax]);
                 putchar('\n');
             }
         }
     }
-    for(ax=0;ax<t.site.dim;ax++)
-        destroy(zone[ax]);
-    return;
 }

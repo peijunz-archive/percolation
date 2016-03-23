@@ -4,23 +4,15 @@
 #define BOND true
 #define SITE false
 
-typedef unsigned char corrtype;
-
-struct torus{
+class torus{
+    bool type;
+public:
     ndarray site;
     ndarray *bond;
+    torus(int dim, int width, double prob, int tp);
+    ~torus();
+    void print();
+    void wrapping();
 };
-
-void inittorus(torus &t, int dim, int width, int type=BOND);//OK
-
-void destroytorus(torus &t);
-
-void setbond(torus &t, double prob);
-
-void setsite(torus &t, double prob);
-
-void wrapping(torus &t);
-
-void printtorus(torus &t);//OK
 
 #endif // GRAPH_H
