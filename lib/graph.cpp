@@ -17,8 +17,8 @@
 class torus{
     bool type;
 public:
-    ndarray site;
-    ndarray *bond;
+    ndarray<char> site;
+    ndarray<char> *bond;
     torus(int dim, int width, double prob, int tp);
     ~torus();
     void print();
@@ -32,7 +32,7 @@ torus::torus(int dim, int width, double prob, int tp):site(dim,width), type(tp){
         randomize(site,prob);
     }
     else{
-        bond=new ndarray[dim];
+        bond=new ndarray<char>[dim];
         for(ax=0;ax<site.dim;ax++){
             bond[ax].reset(dim,width);
             randomize(bond[ax],prob);
@@ -67,8 +67,8 @@ void torus::print(){
 }
 
 void torus::wrapping(){
-    quene q;
-    ndarray zone[site.dim];
+    quene<int> q;
+    ndarray<char> zone[site.dim];
     int delta, wrap[site.dim];
     int i, point=0,near=0, wrapcount, path, ax, absax, tmpax;
     for(ax=0;ax<site.dim;ax++){

@@ -7,8 +7,8 @@
 class torus{
     bool type;
 public:
-    ndarray site;
-    ndarray *bond;
+    ndarray<char> site;
+    ndarray<char> *bond;
     torus(int dim, int width, double prob, int tp);
     ~torus();
     void print();
