@@ -13,7 +13,7 @@
 #define EMPTY 0
 #define INQUENE -1
 #define POPOUT -2
-#define CLUSTER
+//#define CLUSTER
 //#define ZONE
 class torus{
     bool type;
@@ -93,8 +93,10 @@ void torus::wrapping(){
                 point=q.popleft();
 #ifdef CLUSTER
                 printf("%-4d",point);
-#endif
                 site.head[point]=cluster;
+#else
+                site.head[point]=POPOUT;
+#endif
                 for(ax=-site.dim;ax<site.dim;ax++){
                     near=site.rollindex(point,ax);// TODO delta
                     absax=(ax>=0)?ax:(-1-ax);
@@ -153,5 +155,8 @@ void torus::wrapping(){
             site.head[i]+=1;
             site.head[i]*=-1;
     }
+
+#ifdef CLUSTER
     site.print();
+#endif
 }
