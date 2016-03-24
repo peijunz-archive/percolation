@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include <time.h>
 
 #define M 2147483647    //2^31-1
@@ -12,8 +13,10 @@ double myrand(int init=0){
     int ip=A*(seed%q), rp=r*(seed/q);
     if(init>0)
         seed=init%M;
-    else if(init<0)
-        myrand((unsigned int)time(NULL));
+    else if(init<0){
+        seed=((unsigned int)time(NULL))%M;
+        printf("The seed is %d\n", seed);
+    }
     else{
         if(ip>=rp) seed=ip-rp;
         else seed=ip-rp+M;
