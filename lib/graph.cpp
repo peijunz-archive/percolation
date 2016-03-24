@@ -14,7 +14,7 @@
 #define EMPTY 0
 #define INQUENE -1
 #define POPOUT -2
-#define CLUSTER
+//#define CLUSTER
 //#define ZONE
 class torus{
     bool type;
@@ -37,9 +37,9 @@ torus::torus(int dim, int width, double prob, int tp):
         randomize(site,prob);
     }
     else{
-        homogenize(site);
-        for(i=0;i<site.size();i++){
-            for(ax=0;ax<site.dim;ax++){
+        homogenize(site);//修改顺序以方便对比
+        for(ax=0;ax<site.dim;ax++){
+            for(i=0;i<site.size();i++){
                 if(distribute(prob)){
                     near=site.rollindex(i,ax);
                     site.head[near]+=1;
@@ -80,7 +80,9 @@ void torus::wrapping(){//For bond ONLY
     snode<char> *ptr=0;
     int delta, wrap[site.dim];
     int i, point=0,near=0, wrapcount, ax, absax, tmpax;
-    char cluster=-1;
+#ifdef CLUSTER
+    int cluster=-1;
+#endif
     for(ax=0;ax<site.dim;ax++){
         zone[ax].reset(site.dim, site.shape);
         homogenize(zone[ax]);//init zone to 0
@@ -93,16 +95,20 @@ void torus::wrapping(){//For bond ONLY
             }
             wrapcount=0;//记录有几个方向wrap
             q.append(i);
-            cluster-=1;
 #ifdef CLUSTER
-            printf("%sNew cluster:\n%s",LINE,LINE);
+            cluster-=1;
+#endif
+#ifdef CLUSTER
+            printf("%sNew cluster:%d\n%s",LINE,i,LINE);
 #endif
             while(q.length>0){
                 point=q.popleft();
 #ifdef CLUSTER
                 printf("%-4d",point);
-#endif
+                site.head[point]=cluster;
+#else
                 site.head[point]=POPOUT;
+#endif
                 ptr=nears.head[point].head;
                 while(ptr){
                     ax=ptr->data;
@@ -152,10 +158,12 @@ void torus::wrapping(){//For bond ONLY
             }
         }
     }
+#ifdef CLUSTER
     for(i=0;i<site.size();i++){
         if(site.head[i]<0)
             site.head[i]+=1;
             site.head[i]*=-1;
     }
     site.print();
+#endif
 }

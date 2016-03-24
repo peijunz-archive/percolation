@@ -13,13 +13,13 @@ int main(){
     scanf("%d%d%d%lf",&seed, &dim, &width,&prob);
     printf("%d %d %d %f\n",seed, dim, width, prob);
 #else
-    seed=-1;
-    dim=2;
-    width=10;
-    prob=0.59;
+    seed=1458822974;
+    dim=8;
+    width=8;
+    prob=0.068;
 #endif
     myrand(seed);
-    torus t(dim,width,prob,SITE);
+    torus t(dim,width,prob,BOND);
     t.wrapping();
     return 0;
 }
