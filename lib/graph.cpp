@@ -14,7 +14,8 @@
 #define EMPTY 0
 #define INQUENE -1
 #define POPOUT -2
-
+#define CLUSTER
+//#define ZONE
 class torus{
     bool type;
 public:
@@ -79,10 +80,10 @@ void torus::wrapping(){//For bond ONLY
     snode<char> *ptr=0;
     int delta, wrap[site.dim];
     int i, point=0,near=0, wrapcount, ax, absax, tmpax;
+    char cluster=-1;
     for(ax=0;ax<site.dim;ax++){
         zone[ax].reset(site.dim, site.shape);
         homogenize(zone[ax]);//init zone to 0
-//        zone[ax].print();
     }
     for(i=0;i<site.size();i++){
         if (site.head[i]>0){//unvisited site
@@ -92,10 +93,15 @@ void torus::wrapping(){//For bond ONLY
             }
             wrapcount=0;//记录有几个方向wrap
             q.append(i);
-//            printf("%sNew cluster:\n%s",LINE,LINE);
+            cluster-=1;
+#ifdef CLUSTER
+            printf("%sNew cluster:\n%s",LINE,LINE);
+#endif
             while(q.length>0){
                 point=q.popleft();
-//                printf("%4d",point);
+#ifdef CLUSTER
+                printf("%-4d",point);
+#endif
                 site.head[point]=POPOUT;
                 ptr=nears.head[point].head;
                 while(ptr){
@@ -103,7 +109,7 @@ void torus::wrapping(){//For bond ONLY
                     ptr=ptr->next;
                     near=site.rollindex(point,ax);// TODO delta
                     absax=(ax>=0)?ax:(-1-ax);
-                    if((2*ax+1)*(near-i)<0) delta=(ax>=0)?1:-1;
+                    if((2*ax+1)*(near-point)<0) delta=(ax>=0)?1:-1;
                     else delta=0;
                     if (site.head[near]>0){
                         for(tmpax=0;tmpax<site.dim;tmpax++)
@@ -119,13 +125,25 @@ void torus::wrapping(){//For bond ONLY
                             if(zone[tmpax].head[near] != zone[tmpax].head[point]){
                                 wrap[tmpax]=1;
                                 wrapcount+=1;
+#ifdef ZONE
+                                printf("Ax:%d\tJudgement: %d %d, Delta:%d\n",tmpax,point,near,delta);
+                                printf("Site:\n");
+                                site.print();
+                                printf("Zone:\n");
+                                zone[0].print();
+                                printf("Zone:\n");
+                                zone[1].print();
+#endif
                             }
                         }
                         zone[absax].head[point]-=delta;//Canceled!
                     }
                 }
             }
-//            putchar('\n');
+
+#ifdef CLUSTER
+            putchar('\n');
+#endif
             if(wrapcount>0){
                 printf("Wrapping Status: ");
                 for(tmpax=0;tmpax<site.dim;tmpax++)
@@ -134,4 +152,10 @@ void torus::wrapping(){//For bond ONLY
             }
         }
     }
+    for(i=0;i<site.size();i++){
+        if(site.head[i]<0)
+            site.head[i]+=1;
+            site.head[i]*=-1;
+    }
+    site.print();
 }
