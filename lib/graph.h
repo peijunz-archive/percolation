@@ -11,7 +11,6 @@ public:
     ndarray <char> site;
     ndarray <char> *bond;
     torus(int dim, int width, double prob, int tp);
-    ~torus();
     void print();
     void wrapping();
 };

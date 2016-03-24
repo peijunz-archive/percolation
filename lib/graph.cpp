@@ -3,6 +3,7 @@
 #include "16807.h"
 #include "ndarray.h"
 #include "deque.h"
+#include "linklist.h"
 
 //External Macros
 #define BOND true
@@ -18,31 +19,31 @@ class torus{
     bool type;
 public:
     ndarray<char> site;
-    ndarray<char> *bond;
+    ndarray<llist<char>> nears;
     torus(int dim, int width, double prob, int tp);
-    ~torus();
+//    ~torus();
     void print();
     void wrapping();
 };
+inline int rev(int ax){
+    return -1-ax;
+}
 
-torus::torus(int dim, int width, double prob, int tp):site(dim,width), type(tp){
+torus::torus(int dim, int width, double prob, int tp):
+    site(dim,width), nears(dim,width), type(tp){
     int ax, i, near;
-    if(tp==SITE){
-        bond=NULL;
+    if(tp==SITE){//待定，由于找邻居Site也需要大量循环
         randomize(site,prob);
     }
     else{
-        bond=new ndarray<char>[dim];
-        for(ax=0;ax<site.dim;ax++){
-            bond[ax].reset(dim,width);
-            randomize(bond[ax],prob);
-        }
         homogenize(site);
-        for(i=0;i<site.stride[0];i++){
+        for(i=0;i<site.size();i++){
             for(ax=0;ax<site.dim;ax++){
-                if(bond[ax].head[i]){
-                    near=bond[ax].rollindex(i,ax);
+                if(distribute(prob)){
+                    near=site.rollindex(i,ax);
                     site.head[near]+=1;
+                    nears.head[near].addsnode(rev(ax));
+                    nears.head[i].addsnode(ax);
                     site.head[i]+=1;
                 }
             }
@@ -50,33 +51,40 @@ torus::torus(int dim, int width, double prob, int tp):site(dim,width), type(tp){
     }
 }
 
-torus::~torus(){
-    if(type==BOND)
-        delete [] bond;
-}
+//torus::~torus(){
+//    if(type==BOND)
+//        delete [] bond;
+//}
 
 void torus::print(){
+    snode<char>* ptr;
     printf("%sSite:\n%s",LINE,LINE);
     site.print();
     if(type==SITE)
         return;
-    for(int i=0;i<site.dim;i++){
-        printf("%sBond in axis %d\n%s", LINE, i, LINE);
-        bond[i].print();
+    for(int i=0;i<site.size();i++){
+        printf("Site %d: ", i);
+        ptr=nears.head[i].head;
+        while(ptr){
+            printf("%3d",ptr->data);
+            ptr=ptr->next;
+        }
+        putchar('\n');
     }
 }
 
-void torus::wrapping(){
+void torus::wrapping(){//For bond ONLY
     quene<int> q;
     ndarray<char> zone[site.dim];
+    snode<char> *ptr=0;
     int delta, wrap[site.dim];
-    int i, point=0,near=0, wrapcount, path, ax, absax, tmpax;
+    int i, point=0,near=0, wrapcount, ax, absax, tmpax;
     for(ax=0;ax<site.dim;ax++){
         zone[ax].reset(site.dim, site.shape);
         homogenize(zone[ax]);//init zone to 0
 //        zone[ax].print();
     }
-    for(i=0;i<site.stride[0];i++){
+    for(i=0;i<site.size();i++){
         if (site.head[i]>0){//unvisited site
             for(ax=0;ax<site.dim;ax++){//初始化起点的区为{0,0,...,0}
                 zone[ax].head[i]=0;//init to 0
@@ -89,35 +97,31 @@ void torus::wrapping(){
                 point=q.popleft();
 //                printf("%4d",point);
                 site.head[point]=POPOUT;
-                for(ax=-site.dim;ax<site.dim;ax++){
+                ptr=nears.head[point].head;
+                while(ptr){
+                    ax=ptr->data;
+                    ptr=ptr->next;
                     near=site.rollindex(point,ax);// TODO delta
                     absax=(ax>=0)?ax:(-1-ax);
                     if((2*ax+1)*(near-i)<0) delta=(ax>=0)?1:-1;
                     else delta=0;
-                    if(type==SITE) path=site.head[near];
-                    else{//bond
-                        if(ax>=0) path=bond[absax].head[point];
-                        else path=bond[absax].head[near];
+                    if (site.head[near]>0){
+                        for(tmpax=0;tmpax<site.dim;tmpax++)
+                            zone[tmpax].head[near]=zone[tmpax].head[point];
+                        zone[absax].head[near]+=delta;
+                        q.append(near);
+                        site.head[near]=INQUENE;
                     }
-                    if(path){
-                        if (site.head[near]>0){
-                            for(tmpax=0;tmpax<site.dim;tmpax++)
-                                zone[tmpax].head[near]=zone[tmpax].head[point];
-                            zone[absax].head[near]+=delta;
-                            q.append(near);
-                            site.head[near]=INQUENE;
-                        }
-                        else if(site.head[near]==INQUENE){
-                            zone[absax].head[point]+=delta;//will cancel it soon
-                            for(int tmpax=0;tmpax<site.dim;tmpax++){
-                                if(wrap[tmpax]) continue;
-                                if(zone[tmpax].head[near] != zone[tmpax].head[point]){
-                                    wrap[tmpax]=1;
-                                    wrapcount+=1;
-                                }
+                    else if(site.head[near]==INQUENE){
+                        zone[absax].head[point]+=delta;//will cancel it soon
+                        for(int tmpax=0;tmpax<site.dim;tmpax++){
+                            if(wrap[tmpax]) continue;
+                            if(zone[tmpax].head[near] != zone[tmpax].head[point]){
+                                wrap[tmpax]=1;
+                                wrapcount+=1;
                             }
-                            zone[absax].head[point]-=delta;//Canceled!
                         }
+                        zone[absax].head[point]-=delta;//Canceled!
                     }
                 }
             }

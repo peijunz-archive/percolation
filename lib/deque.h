@@ -43,7 +43,8 @@ elemtype quene<elemtype>::pop(){
     delete tmp;
     if (length!=1)
         head->before=NULL;
-    length--;
+    if(length)
+        length--;
     return elem;
 }
 
@@ -61,7 +62,8 @@ elemtype quene<elemtype>::popleft(){//Copy of pop(), just replace head<-->tail, 
     delete tmp;
     if (length!=1)
         tail->next=NULL;
-    length--;
+    if(length)
+        length--;
     return elem;
 }
 
