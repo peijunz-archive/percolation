@@ -2,15 +2,17 @@
 #define GRAPH_H
 
 #include "ndarray.h"
+#include "linklist.h"
 #define BOND true
 #define SITE false
 
 class torus{
-    bool type;
 public:
     ndarray <char> site;
-    ndarray <char> *bond;
-    torus(int dim, int width, double prob, int tp);
+    ndarray<llist<char>> nears;
+    torus(int dim, int width):site(dim,width), nears(dim,width){}
+    torus(int dim, int width, double prob);
+    void reset(double prob, bool clr=true);
     void print();
     void wrapping();
 };

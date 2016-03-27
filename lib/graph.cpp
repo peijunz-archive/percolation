@@ -17,11 +17,12 @@
 //#define CLUSTER
 //#define ZONE
 class torus{
-    bool type;
 public:
     ndarray<char> site;
     ndarray<llist<char>> nears;
-    torus(int dim, int width, double prob, int tp);
+    torus(int dim, int width):site(dim,width), nears(dim,width){}
+    torus(int dim, int width, double prob);
+    void reset(double prob, bool clr);
 //    ~torus();
     void print();
     void wrapping();
@@ -29,27 +30,30 @@ public:
 inline int rev(int ax){
     return -1-ax;
 }
-
-torus::torus(int dim, int width, double prob, int tp):
-    site(dim,width), nears(dim,width), type(tp){
+void torus::reset(double prob, bool clr=true){
     int ax, i, near;
-    if(tp==SITE){//待定，由于找邻居Site也需要大量循环
-        randomize(site,prob);
+    homogenize(site);//修改顺序以方便对比
+    if(clr){
+        for(i=0;i<site.size();i++){
+            nears.head[i].clear();
+        }
     }
-    else{
-        homogenize(site);//修改顺序以方便对比
-        for(ax=0;ax<site.dim;ax++){
-            for(i=0;i<site.size();i++){
-                if(distribute(prob)){
-                    near=site.rollindex(i,ax);
-                    site.head[near]+=1;
-                    nears.head[near].addsnode(rev(ax));
-                    nears.head[i].addsnode(ax);
-                    site.head[i]+=1;
-                }
+    for(ax=0;ax<site.dim;ax++){
+        for(i=0;i<site.size();i++){
+            if(distribute(prob)){
+                near=site.rollindex(i,ax);
+                site.head[near]+=1;
+                nears.head[near].addsnode(rev(ax));
+                nears.head[i].addsnode(ax);
+                site.head[i]+=1;
             }
         }
     }
+}
+
+torus::torus(int dim, int width, double prob):
+    site(dim,width), nears(dim,width){
+    reset(prob,false);
 }
 
 //torus::~torus(){
@@ -61,8 +65,6 @@ void torus::print(){
     snode<char>* ptr;
     printf("%sSite:\n%s",LINE,LINE);
     site.print();
-    if(type==SITE)
-        return;
     for(int i=0;i<site.size();i++){
         printf("Site %d: ", i);
         ptr=nears.head[i].head;
@@ -97,8 +99,6 @@ void torus::wrapping(){//For bond ONLY
             q.append(i);
 #ifdef CLUSTER
             cluster-=1;
-#endif
-#ifdef CLUSTER
             printf("%sNew cluster:%d\n%s",LINE,i,LINE);
 #endif
             while(q.length>0){

@@ -16,16 +16,21 @@ public:
     snode<dtype> *head;
     llist():head(0){}
     ~llist();
+    void clear();
     void addsnode(dtype);
 };
 
 template <typename dtype>
-llist<dtype>::~llist(){
+void llist<dtype>::clear(){
     snode<dtype>* tmp=0;
     while((tmp=head)!=0){
         head=head->next;
         delete tmp;
     }
+}
+template <typename dtype>
+llist<dtype>::~llist(){
+    clear();
 }
 
 template <typename dtype>
