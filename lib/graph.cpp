@@ -35,17 +35,17 @@ void torus::reset(double prob, bool clr=true){
     homogenize(site);//修改顺序以方便对比
     if(clr){
         for(i=0;i<site.size();i++){
-            nears.head[i].clear();
+            nears[i].clear();
         }
     }
     for(ax=0;ax<site.dim;ax++){
         for(i=0;i<site.size();i++){
-            if(distribute(prob)){
+            if(rand()<prob){
                 near=site.rollindex(i,ax);
-                site.head[near]+=1;
-                nears.head[near].addsnode(rev(ax));
-                nears.head[i].addsnode(ax);
-                site.head[i]+=1;
+                site[near]+=1;
+                nears[near].addsnode(rev(ax));
+                nears[i].addsnode(ax);
+                site[i]+=1;
             }
         }
     }
@@ -67,12 +67,19 @@ void torus::print(){
     site.print();
     for(int i=0;i<site.size();i++){
         printf("Site %d: ", i);
-        ptr=nears.head[i].head;
+        ptr=nears[i].head;
         while(ptr){
             printf("%3d",ptr->data);
             ptr=ptr->next;
         }
         putchar('\n');
+    }
+}
+
+template <typename T>
+void randomize(ndarray<T> &a, double prob){
+    for(int i=0;i<a.stride[0];i++){
+        a[i]=(myrand()<prob?1:0);
     }
 }
 
@@ -86,13 +93,13 @@ void torus::wrapping(){//For bond ONLY
     int cluster=-1;
 #endif
     for(ax=0;ax<site.dim;ax++){
-        zone[ax].reset(site.dim, site.shape);
+        zone[ax].set(site.dim, site.shape);
         homogenize(zone[ax]);//init zone to 0
     }
     for(i=0;i<site.size();i++){
-        if (site.head[i]>0){//unvisited site
+        if (site[i]>0){//unvisited site
             for(ax=0;ax<site.dim;ax++){//初始化起点的区为{0,0,...,0}
-                zone[ax].head[i]=0;//init to 0
+                zone[ax][i]=0;//init to 0
                 wrap[ax]=0;
             }
             wrapcount=0;//记录有几个方向wrap
@@ -105,11 +112,11 @@ void torus::wrapping(){//For bond ONLY
                 point=q.popleft();
 #ifdef CLUSTER
                 printf("%-4d",point);
-                site.head[point]=cluster;
+                site[point]=cluster;
 #else
-                site.head[point]=POPOUT;
+                site[point]=POPOUT;
 #endif
-                ptr=nears.head[point].head;
+                ptr=nears[point].head;
                 while(ptr){
                     ax=ptr->data;
                     ptr=ptr->next;
@@ -117,18 +124,18 @@ void torus::wrapping(){//For bond ONLY
                     absax=(ax>=0)?ax:(-1-ax);
                     if((2*ax+1)*(near-point)<0) delta=(ax>=0)?1:-1;
                     else delta=0;
-                    if (site.head[near]>0){
+                    if (site[near]>0){
                         for(tmpax=0;tmpax<site.dim;tmpax++)
-                            zone[tmpax].head[near]=zone[tmpax].head[point];
-                        zone[absax].head[near]+=delta;
+                            zone[tmpax][near]=zone[tmpax][point];
+                        zone[absax][near]+=delta;
                         q.append(near);
-                        site.head[near]=INQUENE;
+                        site[near]=INQUENE;
                     }
-                    else if(site.head[near]==INQUENE){
-                        zone[absax].head[point]+=delta;//will cancel it soon
+                    else if(site[near]==INQUENE){
+                        zone[absax][point]+=delta;//will cancel it soon
                         for(int tmpax=0;tmpax<site.dim;tmpax++){
                             if(wrap[tmpax]) continue;
-                            if(zone[tmpax].head[near] != zone[tmpax].head[point]){
+                            if(zone[tmpax][near] != zone[tmpax][point]){
                                 wrap[tmpax]=1;
                                 wrapcount+=1;
 #ifdef ZONE
@@ -142,7 +149,7 @@ void torus::wrapping(){//For bond ONLY
 #endif
                             }
                         }
-                        zone[absax].head[point]-=delta;//Canceled!
+                        zone[absax][point]-=delta;//Canceled!
                     }
                 }
             }
@@ -160,9 +167,9 @@ void torus::wrapping(){//For bond ONLY
     }
 #ifdef CLUSTER
     for(i=0;i<site.size();i++){
-        if(site.head[i]<0)
-            site.head[i]+=1;
-            site.head[i]*=-1;
+        if(site[i]<0)
+            site[i]+=1;
+            site[i]*=-1;
     }
     site.print();
 #endif

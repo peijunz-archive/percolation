@@ -9,7 +9,7 @@
 class torus{
 public:
     ndarray <char> site;
-    ndarray<llist<char>> nears;
+    ndarray<llist<char> > nears;
     torus(int dim, int width):site(dim,width), nears(dim,width){}
     torus(int dim, int width, double prob);
     void reset(double prob, bool clr=true);

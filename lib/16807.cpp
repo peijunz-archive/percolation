@@ -3,7 +3,15 @@
 
 #define M 2147483647    //2^31-1
 #define A 16807         //16807产生器
-
+/**
+ * @brief myrand
+ * @param init
+ * @return psudo-random number
+ *
+ * if init=0, continue iteration using the previous seed
+ * if init<0, reset the seed using current time
+ * if init>0, reset the seed using init
+ */
 double myrand(int init=0){
     /*init>0, use thae value to initialize seed
               =0, continue
