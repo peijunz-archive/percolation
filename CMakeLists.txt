@@ -1,7 +1,18 @@
 cmake_minimum_required(VERSION 2.8)
 project(Percolation)
-
+include_directories(./lib/)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 
-set(SOURCE_FILES main.cpp lib/16807.h lib/16807.cpp lib/ndarray.h lib/deque.h lib/iter.h lib/graph.cpp lib/graph.h lib/linklist.h)
+set(SOURCE_FILES
+    main.cpp
+    lib/16807.h
+    lib/16807.cpp
+    lib/iter.h
+    lib/iter.cpp
+    lib/graph.h
+    lib/graph.cpp
+    lib/linklist.h
+    lib/deque.h
+    lib/ndarray.h)
+
 add_executable(Percolation ${SOURCE_FILES})

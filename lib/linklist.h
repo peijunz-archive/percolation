@@ -11,6 +11,9 @@ public:
 };
 
 template <typename dtype>
+/**
+ * @brief The linklist class to store the near point of
+ */
 class llist{
 public:
     snode<dtype> *head;

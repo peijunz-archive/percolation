@@ -56,11 +56,6 @@ torus::torus(int dim, int width, double prob):
     reset(prob,false);
 }
 
-//torus::~torus(){
-//    if(type==BOND)
-//        delete [] bond;
-//}
-
 void torus::print(){
     snode<char>* ptr;
     printf("%sSite:\n%s",LINE,LINE);
@@ -79,7 +74,10 @@ void torus::print(){
 template <typename T>
 void randomize(ndarray<T> &a, double prob){
     for(int i=0;i<a.stride[0];i++){
-        a[i]=(myrand()<prob?1:0);
+        if(myrand()<prob)
+            a[i]=1;
+        else
+            a[i]=0;
     }
 }
 

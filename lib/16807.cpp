@@ -1,21 +1,18 @@
-#include <stdio.h>
-#include <time.h>
+#include <iostream>
+#include <ctime>
 
-#define M 2147483647    //2^31-1
-#define A 16807         //16807产生器
 /**
  * @brief myrand
  * @param init
+ *  + init=0, continue iteration using the previous seed
+ *  + init<0, reset the seed using current time
+ *  + init>0, reset the seed using init
  * @return psudo-random number
  *
- * if init=0, continue iteration using the previous seed
- * if init<0, reset the seed using current time
- * if init>0, reset the seed using init
+ * 16807 psudo-random number generator
  */
 double myrand(int init=0){
-    /*init>0, use thae value to initialize seed
-              =0, continue
-              <0, use time to initialize*/
+    const int M=2147483647, A=16807;
     const int q=M/A, r=M%A;
     static int seed;
     int ip=A*(seed%q), rp=r*(seed/q);
@@ -23,7 +20,7 @@ double myrand(int init=0){
         seed=init%M;
     else if(init<0){
         seed=((unsigned int)time(NULL))%M;
-        printf("The seed is %d\n", seed);
+        std::cout<<"The seed is "<<seed<<std::endl;
     }
     else{
         if(ip>=rp) seed=ip-rp;

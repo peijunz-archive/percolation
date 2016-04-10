@@ -1,16 +1,15 @@
 #include <stdio.h>
 #include <iostream>
 #include <initializer_list>
-#include "lib/16807.h"
-#include "lib/ndarray.h"
-#include "lib/deque.h"
-#include "lib/graph.h"
-#include "lib/iter.h"
+#include "ndarray.h"
+#include "deque.h"
+#include "graph.h"
+#include "iter.h"
+#include "16807.h"
 //1458816173 Site Percolation有问题
 #define DEBUG
 
 int main(){
-    std::initializer_list<int> l;
     int seed, dim, width;
     double prob;
 #ifndef DEBUG
