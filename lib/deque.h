@@ -3,36 +3,36 @@
 
 #include <iostream>
 
-template <typename S> class node{
+template <typename S> class dnode{
 public:
     S elem;
-    node* next;
-    node* before;
-    node():next(NULL), before(NULL){}
+    dnode* next;
+    dnode* before;
+    dnode():next(NULL), before(NULL){}
 };
 
-template <typename elemtype> class quene{
+template <typename elemtype> class deque{
 public:
     int length;
-    node<elemtype>* tail;
-    node<elemtype>* head;
-    quene():length(0),tail(NULL),head(NULL){}
-    ~quene();
+    dnode<elemtype>* tail;
+    dnode<elemtype>* head;
+    deque():length(0),tail(NULL),head(NULL){}
+    ~deque();
     elemtype pop();
     elemtype popleft();
     void append(elemtype elem);
 };
 template <typename elemtype>
-quene<elemtype>::~quene(){
+deque<elemtype>::~deque(){
     while(length>0){
         pop();
     }
 }
 
 template <typename elemtype>
-elemtype quene<elemtype>::pop(){
+elemtype deque<elemtype>::pop(){
     elemtype elem;
-    node<elemtype>* tmp=NULL;
+    dnode<elemtype>* tmp=NULL;
     if(length==0)
         exit;
     if (length==1)
@@ -49,9 +49,9 @@ elemtype quene<elemtype>::pop(){
 }
 
 template <typename elemtype>
-elemtype quene<elemtype>::popleft(){//Copy of pop(), just replace head<-->tail, before<-->next
+elemtype deque<elemtype>::popleft(){//Copy of pop(), just replace head<-->tail, before<-->next
     elemtype elem;
-    node<elemtype>* tmp=NULL;
+    dnode<elemtype>* tmp=NULL;
     if(length==0)
         exit;
     if (length==1)
@@ -68,8 +68,8 @@ elemtype quene<elemtype>::popleft(){//Copy of pop(), just replace head<-->tail, 
 }
 
 template <typename elemtype>
-void quene<elemtype>::append(elemtype elem){
-    node<elemtype>* p=new node<elemtype>;
+void deque<elemtype>::append(elemtype elem){
+    dnode<elemtype>* p=new dnode<elemtype>;
     p->elem=elem;
     if (head==0){
         head=tail=p;
