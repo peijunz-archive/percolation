@@ -4,6 +4,7 @@ include_directories(./lib/)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 
 set(SOURCE_FILES
+    test.cpp
     main.cpp
     lib/16807.h
     lib/16807.cpp

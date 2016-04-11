@@ -17,17 +17,13 @@ int main(){
     scanf("%d%d%d%lf",&seed, &dim, &width,&prob);
     printf("%d %d %d %f\n",seed, dim, width, prob);
 #else
-    seed=-1;
+    seed=19951201;
     dim=8;
     width=8;
     prob=0.068;
 #endif
-    torus t(dim,width);
-    for(int i=0;i<3;i++){
-        printf("Test %d:\n",i);
-        myrand(-1);
-        t.reset(prob);
-        t.wrapping();
-    }
+    myrand(seed);
+    torus t(dim,width,prob);
+    t.wrapping();
     return 0;
 }
