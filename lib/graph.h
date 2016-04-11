@@ -2,7 +2,7 @@
 #define GRAPH_H
 
 #include "ndarray.h"
-#include "linklist.h"
+#include "singlelist.h"
 #define BOND true
 #define SITE false
 

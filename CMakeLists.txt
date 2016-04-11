@@ -9,10 +9,10 @@ set(SOURCE_FILES
     lib/test.h
     lib/16807.h
     lib/16807.cpp
-    lib/iter.h
-    lib/iter.cpp
-    lib/linklist.h
-    lib/deque.h
-    lib/ndarray.h)
+    lib/singlelist.h
+    lib/ndarray.h
+    lib/graph.cpp
+    lib/graph.h
+    )
 
 add_executable(Percolation ${SOURCE_FILES})

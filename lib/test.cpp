@@ -1,5 +1,5 @@
 #include <iostream>
-#include "linklist.h"
+#include "singlelist.h"
 #include "16807.h"
 #include "ndarray.h"
 
@@ -34,10 +34,14 @@ int testlist(){
     }
     cout<<"Stack"<<endl;
     while(s.notempty()){
-        cout<<s.pop()<<endl;
+        cout<<s.pop()<<' ';
+        cout<<s.pop()<<' ';
+        cout<<s.pop()<<' ';
     }
+    cout<<endl;
     cout<<"Quene"<<endl;
     while(q.notempty()){
-        cout<<q.pop()<<endl;
+        cout<<q.pop()<<' ';
     }
+    cout<<endl;
 }

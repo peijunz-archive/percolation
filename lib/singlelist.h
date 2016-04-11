@@ -60,7 +60,7 @@ dtype stack<dtype>::pop(){
         delete tmp;
         return d;
     }
-    cout<<"ERROR in stack.pop():\tAlready EMPTY"<<endl;
+    cout<<endl<<"ERROR in stack.pop():\tAlready EMPTY"<<endl;
     exit(0);
 }
 
@@ -114,7 +114,7 @@ dtype quene<dtype>::pop(){
         delete tmp;
         return d;
     }
-    cout<<"ERROR in quene.pop():\tAlready EMPTY"<<endl;
+    cout<<endl<<"ERROR in quene.pop():\tAlready EMPTY"<<endl;
 }
 
 template <typename dtype>

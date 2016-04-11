@@ -2,8 +2,7 @@
 #include <stdlib.h>
 #include "16807.h"
 #include "ndarray.h"
-#include "deque.h"
-#include "linklist.h"
+#include "singlelist.h"
 
 //External Macros
 #define BOND true
@@ -19,7 +18,7 @@
 class torus{
 public:
     ndarray<char> site;
-    ndarray<llist<char>> nears;
+    ndarray<stack<char>> nears;
     torus(int dim, int width):site(dim,width), nears(dim,width){}
     torus(int dim, int width, double prob);
     void reset(double prob, bool clr);
@@ -33,18 +32,13 @@ inline int rev(int ax){
 void torus::reset(double prob, bool clr=true){
     int ax, i, near;
     homogenize(site);//修改顺序以方便对比
-    if(clr){
-        for(i=0;i<site.size();i++){
-            nears[i].clear();
-        }
-    }
     for(ax=0;ax<site.dim;ax++){
         for(i=0;i<site.size();i++){
             if(myrand()<prob){
                 near=site.rollindex(i,ax);
                 site[near]+=1;
-                nears[near].addsnode(rev(ax));
-                nears[i].addsnode(ax);
+                nears[near].append(rev(ax));
+                nears[i].append(ax);
                 site[i]+=1;
             }
         }
@@ -57,16 +51,15 @@ torus::torus(int dim, int width, double prob):
 }
 
 void torus::print(){
-    snode<char>* ptr;
     printf("%sSite:\n%s",LINE,LINE);
     site.print();
     for(int i=0;i<site.size();i++){
         printf("Site %d: ", i);
-        ptr=nears[i].head;
-        while(ptr){
-            printf("%3d",ptr->data);
-            ptr=ptr->next;
-        }
+//        ptr=nears[i].head;
+//        while(ptr){
+//            printf("%3d",ptr->data);
+//            ptr=ptr->next;
+//        }
         putchar('\n');
     }
 }
@@ -84,7 +77,6 @@ void randomize(ndarray<T> &a, double prob){
 void torus::wrapping(){//For bond ONLY
     quene<int> q;
     ndarray<char> zone[site.dim];
-    snode<char> *ptr=0;
     int delta, wrap[site.dim];
     int i, point=0,near=0, wrapcount, ax, absax, tmpax;
 #ifdef CLUSTER
@@ -106,18 +98,16 @@ void torus::wrapping(){//For bond ONLY
             cluster-=1;
             printf("%sNew cluster:%d\n%s",LINE,i,LINE);
 #endif
-            while(q.length>0){
-                point=q.popleft();
+            while(q.notempty()){
+                point=q.pop();
 #ifdef CLUSTER
                 printf("%-4d",point);
                 site[point]=cluster;
 #else
                 site[point]=POPOUT;
 #endif
-                ptr=nears[point].head;
-                while(ptr){
-                    ax=ptr->data;
-                    ptr=ptr->next;
+                while(nears[point].notempty()){
+                    ax=nears[point].pop();
                     near=site.rollindex(point,ax);// TODO delta
                     absax=(ax>=0)?ax:(-1-ax);
                     if((2*ax+1)*(near-point)<0) delta=(ax>=0)?1:-1;
