@@ -40,7 +40,7 @@ void torus::reset(double prob, bool clr=true){
     }
     for(ax=0;ax<site.dim;ax++){
         for(i=0;i<site.size();i++){
-            if(rand()<prob){
+            if(myrand()<prob){
                 near=site.rollindex(i,ax);
                 site[near]+=1;
                 nears[near].addsnode(rev(ax));
