@@ -1,14 +1,6 @@
 #include <iostream>
 #include <ctime>
-
-/**
- * @brief myrand
- * @param init
- *  + init=0, continue iteration using the previous seed
- *  + init<0, reset the seed using current time
- *  + init>0, reset the seed using init
- * @return psudo-random number
- *
+/** \file 16807.cpp
  * 16807 psudo-random number generator
  */
 double myrand(int init=0){

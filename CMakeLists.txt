@@ -7,6 +7,7 @@ set(SOURCE_FILES
     main.cpp
     lib/test.cpp
     lib/test.h
+    lib/nditer.h
     lib/16807.h
     lib/16807.cpp
     lib/singlelist.h

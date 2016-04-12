@@ -8,5 +8,6 @@
 
 int main(){
     testlist();
+    testrand();
     return 0;
 }

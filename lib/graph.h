@@ -8,13 +8,13 @@
 
 class torus{
 public:
-    ndarray <char> site;
-    ndarray<llist<char> > nears;
+    ndarray<char> site;
+    ndarray<stack<char>> nears;
     torus(int dim, int width):site(dim,width), nears(dim,width){}
     torus(int dim, int width, double prob);
-    void reset(double prob, bool clr=true);
+    void reset(double prob, bool clr);
+//    ~torus();
     void print();
     void wrapping();
 };
-
 #endif // GRAPH_H

@@ -26,7 +26,7 @@ public:
 
 template <typename dtype>
 /**
- * @brief The stack class
+ * @brief The naive stack class
  */
 class stack{
 public:
@@ -75,6 +75,9 @@ stack<dtype>::~stack(){
 }
 
 template <typename dtype>
+/**
+ * @brief The naive quene class
+ */
 class quene{
 public:
     quene(){tail.next=0;head=&tail;}
@@ -83,7 +86,7 @@ public:
     void append(dtype);
     ///Pop some data out
     dtype pop();
-    ///Judge if the stack is empty
+    ///Judge if the quene is empty
     bool notempty(){return (head!=&tail);}
 private:
     node<dtype> *head;

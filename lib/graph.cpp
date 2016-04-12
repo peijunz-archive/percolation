@@ -8,6 +8,7 @@
 #define BOND true
 #define SITE false
 
+#include "graph.h"
 //Local Macros
 #define LINE "---------------------------\n"
 #define EMPTY 0
@@ -15,17 +16,6 @@
 #define POPOUT -2
 //#define CLUSTER
 //#define ZONE
-class torus{
-public:
-    ndarray<char> site;
-    ndarray<stack<char>> nears;
-    torus(int dim, int width):site(dim,width), nears(dim,width){}
-    torus(int dim, int width, double prob);
-    void reset(double prob, bool clr);
-//    ~torus();
-    void print();
-    void wrapping();
-};
 inline int rev(int ax){
     return -1-ax;
 }

@@ -2,13 +2,17 @@
 #include "singlelist.h"
 #include "16807.h"
 #include "ndarray.h"
+#include "nditer.h"
 
 int testrand(){
     myrand(-1);
-    for(int i=0;i<100;i++){
-        if(myrand()>1 && myrand<0)
+    cout<<"Module: 16807"<<endl;
+    for(int i=0;i<20;i++){
+        cout<<myrand()<<' ';
+        if(myrand()>1 && myrand()<0)
             return 1;
     }
+    cout<<endl;
     return 0;
 }
 
@@ -32,16 +36,22 @@ int testlist(){
         s.append(i);
         q.append(i);
     }
-    cout<<"Stack"<<endl;
+    cout<<"Module: Stack"<<endl;
     while(s.notempty()){
-        cout<<s.pop()<<' ';
-        cout<<s.pop()<<' ';
         cout<<s.pop()<<' ';
     }
     cout<<endl;
-    cout<<"Quene"<<endl;
+    cout<<"Module: Quene"<<endl;
     while(q.notempty()){
         cout<<q.pop()<<' ';
     }
     cout<<endl;
+}
+
+void testnditer(){
+    int a[2]={4,5};
+    nditer it(2,a);
+    while(it.next()){
+        it.print();
+    }
 }
