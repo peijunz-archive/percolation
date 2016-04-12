@@ -12,8 +12,7 @@ set(SOURCE_FILES
     lib/16807.cpp
     lib/singlelist.h
     lib/ndarray.h
-    lib/graph.cpp
-    lib/graph.h
+    lib/wrapping.h
     )
 
 add_executable(Percolation ${SOURCE_FILES})

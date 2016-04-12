@@ -1,13 +1,14 @@
-/***
- * data structure of single directional list
- * quene and stack
- ***/
 
 #ifndef SINGLELIST_H
 #define SINGLELIST_H
-
 #include <iostream>
 #include <stdlib.h>
+/**
+ * @file singlelist.h
+ * @author zpj
+ * @brief Data structure of uni-directional list: quene and stack
+ * @bug No
+ ***/
 
 using namespace std;
 template <typename T>

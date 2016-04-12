@@ -4,6 +4,15 @@
 #include "ndarray.h"
 #include "nditer.h"
 
+/**
+ * @file test.cpp
+ * @author zpj
+ * @brief Test various modules
+ * @bug No
+ */
+/**
+ * @brief test myrand()
+ */
 int testrand(){
     myrand(-1);
     cout<<"Module: 16807"<<endl;
@@ -15,7 +24,9 @@ int testrand(){
     cout<<endl;
     return 0;
 }
-
+/**
+ * @brief test the ndarray template
+ */
 int testndarray(){
     ndarray<char> a[5];
     ndarray<int> b={3,4,5};
@@ -28,7 +39,9 @@ int testndarray(){
     b.print();
     c.print();
 }
-
+/**
+ * @brief test two list class: quene and stack
+ */
 int testlist(){
     stack<int> s;
     quene<int> q;
@@ -47,7 +60,9 @@ int testlist(){
     }
     cout<<endl;
 }
-
+/**
+ * @brief test nditer class
+ */
 void testnditer(){
     int a[2]={4,5};
     nditer it(2,a);

@@ -1,6 +1,13 @@
 #ifndef nditer_H
 #define nditer_H
-
+#include <iostream>
+using namespace std;
+/**
+ * @file nditer.h
+ * @author zpj
+ * @brief Iterator of sub-index for an ndarray
+ * @bug No
+ */
 /**
  * @brief Iterator of sub-index for an ndarray
  */
@@ -60,8 +67,8 @@ bool nditer::next(){
  */
 void nditer::print(){
     for(int i=0;i<dim;i++)
-        printf("%4d ", ind[i]);
-    putchar('\n');
+        cout<<ind[i]<<" ";
+    cout<<endl;
 }
 
 #endif
