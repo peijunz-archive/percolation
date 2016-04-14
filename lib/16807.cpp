@@ -12,6 +12,8 @@
  *  + init=0, continue iteration using the previous seed
  *  + init<0, reset the seed using current time
  *  + init>0, reset the seed using init
+ *
+ * M=2^31-1, A=7^5
  * @return psudo-random number
  */
 double myrand(int init=0){

@@ -4,5 +4,5 @@
 int testrand();
 int testndarray();
 int testlist();
-
+//int power(int, int);
 #endif
