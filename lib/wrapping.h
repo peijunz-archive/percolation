@@ -10,6 +10,7 @@ using namespace std;
  * @author zpj
  * @brief Some code for percolation analysis
  * @todo 确定数据结构
+ *
  * + 由于是三维情形，所以可以直接用邻接矩阵存储这个图！
  * + 使用map存储数据？
  * + 队中每个节点需要的信息有哪些？rawindex, zone[n]
@@ -22,6 +23,7 @@ const int popout=-2;
 inline int rev(int ax){
     return -1-ax;
 }
+/// power a^n by bit operation
 int power(int a, unsigned int n){
     int p=1;
     while(n){

@@ -19,26 +19,32 @@ template <typename T>
  */
 class node{
 public:
+    ///Pointer to next block
     node *next;
+    /// Data to save
     T data;
+    ///Constructor
     node():next(0){}
+    ///Constructor with data
     node(T d):next(0), data(d){}
 };
 
 template <typename dtype>
-/**
- * @brief The naive stack class
- */
+/// The naive stack class
 class stack{
 public:
+    ///Constructor
     stack():head(0){}
+    ///Destructor
     ~stack();
-    void append(dtype); ///< Add new data
-    dtype pop();        ///< Popout some data
+    /// Add new data
+    void append(dtype);
+    /// Pop some data out
+    dtype pop();
     ///Judge if the stack is empty
     bool notempty(){return head?true:false;}
 private:
-    node<dtype> *head;
+    node<dtype> *head;///< head of data
 };
 
 template <typename dtype>
@@ -74,20 +80,22 @@ stack<dtype>::~stack(){
 }
 
 template <typename dtype>
-/**
- * @brief The naive quene class
- */
+/// The naive quene class
 class quene{
 public:
+    ///Constructor
     quene(){tail.next=0;head=&tail;}
+    ///Destructor
     ~quene();
-    void append(dtype); ///< Add new data
-    dtype pop();        ///< Pop some data out
-    ///Judge if the quene is empty
+    /// Add new data
+    void append(dtype);
+    /// Pop some data out
+    dtype pop();
+    /// Judge if the quene is empty
     bool notempty(){return (head!=&tail);}
 private:
-    node<dtype> *head;
-    node<dtype> tail;
+    node<dtype> *head;  ///< Head go 1st
+    node<dtype> tail;   ///< Tail remain
 };
 
 template <typename dtype>
