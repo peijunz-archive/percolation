@@ -1,9 +1,10 @@
-#include <stdio.h>
+#include <iostream>
 #include <stdlib.h>
 #include "16807.h"
 #include "ndarray.h"
 #include "singlelist.h"
 
+using namespace std;
 /**
  * @file wrapping.h
  * @author zpj
@@ -83,10 +84,10 @@ void wrapping(int dim, int width){
                 }
             }
             if(wrapcount>0){
-                printf("Wrapping Status: ");
+                cout<<"Wrapping Status: ";
                 for(tmpax=0;tmpax<dim;tmpax++)
-                    printf("%d ",wrap[tmpax]);
-                putchar('\n');
+                    cout<<wrap[tmpax]<<' ';
+                cout<<'\n';
             }
         }
     }

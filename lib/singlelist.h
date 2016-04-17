@@ -33,10 +33,8 @@ class stack{
 public:
     stack():head(0){}
     ~stack();
-    ///Add new data
-    void append(dtype);
-    ///popout some data
-    dtype pop();
+    void append(dtype); ///< Add new data
+    dtype pop();        ///< Popout some data
     ///Judge if the stack is empty
     bool notempty(){return head?true:false;}
 private:
@@ -61,7 +59,7 @@ dtype stack<dtype>::pop(){
         delete tmp;
         return d;
     }
-    cout<<endl<<"ERROR in stack.pop():\tAlready EMPTY"<<endl;
+    cerr<<endl<<"ERROR in stack.pop():\tAlready EMPTY"<<endl;
     exit(0);
 }
 
@@ -83,10 +81,8 @@ class quene{
 public:
     quene(){tail.next=0;head=&tail;}
     ~quene();
-    ///Add new data
-    void append(dtype);
-    ///Pop some data out
-    dtype pop();
+    void append(dtype); ///< Add new data
+    dtype pop();        ///< Pop some data out
     ///Judge if the quene is empty
     bool notempty(){return (head!=&tail);}
 private:
@@ -118,7 +114,8 @@ dtype quene<dtype>::pop(){
         delete tmp;
         return d;
     }
-    cout<<endl<<"ERROR in quene.pop():\tAlready EMPTY"<<endl;
+    cerr<<endl<<"ERROR in quene.pop():\tAlready EMPTY"<<endl;
+    exit(0);
 }
 
 template <typename dtype>

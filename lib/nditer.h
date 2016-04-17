@@ -17,7 +17,6 @@ public:
      * @brief An array restoring current sub-index
      */
     int *ind;
-//    nditer():dim(0),shape(NULL),ind(NULL){}
     nditer(int d, int *sh);
     ~nditer();
     bool next();

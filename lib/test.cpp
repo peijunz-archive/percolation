@@ -33,11 +33,12 @@ int testndarray(){
     int s[3]={2,3,4};
     ndarray<double> c(3,s);
     for(int i=0;i<5;i++){
-        a[i].set(3,5);
+        a[i]=ndarray<char>(3,5);
     }
     a[2].print();
     b.print();
     c.print();
+    return 0;
 }
 /**
  * @brief test two list class: quene and stack
@@ -59,6 +60,7 @@ int testlist(){
         cout<<q.pop()<<' ';
     }
     cout<<endl;
+    return 0;
 }
 /**
  * @brief test nditer class
