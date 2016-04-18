@@ -1,4 +1,3 @@
-
 #ifndef SINGLELIST_H
 #define SINGLELIST_H
 #include <iostream>

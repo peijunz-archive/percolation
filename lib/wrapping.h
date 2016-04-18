@@ -23,7 +23,7 @@ const int popout=-2;
 inline int rev(int ax){
     return -1-ax;
 }
-/// power a^n by bit operation
+/// power a^n by bit operations
 int power(int a, unsigned int n){
     int p=1;
     while(n){
@@ -41,12 +41,12 @@ void wrapping(int dim, int width){
     ndarray<stack<int>> nears(dim,width);
     quene<int> q;
     ndarray<char> zone[dim];
-    int size=power(width,dim);
+    int size=site.size();
     int delta, wrap[dim];
     int i, point=0, near=0, wrapcount, ax, absax, tmpax;
     for(ax=0;ax<dim;ax++){
-        zone[ax].set(dim, site.shape);
-        homogenize(zone[ax]);//init zone to 0
+        zone[ax]=ndarray<char>(dim, width);//Assign memory by move assignment
+        zone[ax]=0;//init zone to 0
     }
     for(i=0;i<size;i++){
         if (site[i]>0){//unvisited site
