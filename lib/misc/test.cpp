@@ -64,3 +64,26 @@ void testnditer(){
         it.print();
     }
 }
+
+int bencharray(int n){
+    int a[n][n];
+    for(int k=0;k<1000;k++){
+        for(int i=0;i<n;i++){
+            for(int j=0;j<n;j++){
+                a[i][j]=i+j;
+            }
+        }
+    }
+    return a[n/2][n/2];
+}
+int benchndarray(int n){
+    ndarray<int> a{n,n};
+    for(int k=0;k<1000;k++){
+        for(int i=0;i<n;i++){
+            for(int j=0;j<n;j++){
+                a(i,j)=i+j;
+            }
+        }
+    }
+    return a(n/2,n/2);
+}

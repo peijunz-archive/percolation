@@ -64,7 +64,7 @@ public:
         exit(0);
     }
     ///Judge if the stack is empty
-    bool notempty(){return head?true:false;}
+    bool notempty(){return head;}
 private:
     node<dtype> *head;///< head of data
 };

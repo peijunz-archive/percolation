@@ -4,12 +4,6 @@
 #include "singlelist.h"
 
 int main(){
-    ndarray<int> b{5,5};
-    int size=b.size();
-    for(int i=0;i<size;i++){
-        b[i]=i+1;
-    }
-    b.transpose();
-    b.print();
+    cout<<benchndarray(1000)<<endl;
     return 0;
 }
