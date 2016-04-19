@@ -1,26 +1,40 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include "lib/16807.h"
-#include "lib/ndarray.h"
-#include "lib/graph.h"
-#include "lib/deque.h"
+#include <iostream>
+#include "ndarray.h"
+#include "16807.h"
+#include "singlelist.h"
+
 //1458816173 Site Percolation有问题
-#define DEBUG
+inline int f(int &i,int &j){
+    return 1000*i+j;
+}
+
 int main(){
-    int seed, dim, width;
-    double prob;
-#ifndef DEBUG
-    printf("Input seed, dimension, width, prob: ");
-    scanf("%d%d%d%lf",&seed, &dim, &width,&prob);
-    printf("%d %d %d %f\n",seed, dim, width, prob);
-#else
-    seed=1458822974;
-    dim=8;
-    width=8;
-    prob=0.068;
-#endif
-    myrand(seed);
-    torus t(dim,width,prob,BOND);
-    t.wrapping();
+    ndarray<int> b{1000,1000};
+    int a[1000][1000];
+    int ind[2];
+    int &i=ind[0], &j=ind[1];
+    for(int k=0;k<500;k++){
+        for(int t=0;t<1000000;t++){
+            i=t/1000;
+            j=t%1000;
+            b[t]=i*i+j*j-i*j;
+        }
+    }
+//    for(int k=0;k<500;k++){
+//        for(i=0;i<1000;i++){
+//            for(j=0;j<1000;j++){
+////                b(i,j)=i*i+j*j-i*j;
+//                b[f(i,j)]=i*i+j*j-i*j;
+//            }
+//        }
+//    }
+//    for(int k=0;k<500;k++){
+//        for(i=0;i<1000;i++){
+//            for(j=0;j<1000;j++){
+//                a[i][j]=i*i+j*j-i*j;
+//            }
+//        }
+//    }
+    cout<<a[100][100]<<endl<<b(100,100)<<endl;
     return 0;
 }

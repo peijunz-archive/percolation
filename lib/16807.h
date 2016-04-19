@@ -1,7 +1,7 @@
 #ifndef RANDOM16807_H
 #define RANDOM16807_H
 
-#define INIT_RANDOM -1
-double myrand(int initseed=0);
+double setseed(int init=-1, int go=10);
+double myrand();
 
-#endif
+#endif  //RANDOM16807_H
