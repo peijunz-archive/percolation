@@ -4,9 +4,10 @@
 #include "singlelist.h"
 
 int main(){
-    int a[5]={1,2,3,4,5};
-    const int *p=a;
-    a[2]=7;
-    cout<<p[2]<<endl;
+    ndarray<int> a{3,4,4,5};
+    for(int i=0;i<a.size();i++){
+        a[i]=i+1;
+    }
+    cout<<a;
     return 0;
 }
