@@ -9,11 +9,7 @@ using namespace std;
  * @file wrapping.h
  * @author zpj
  * @brief Some code for percolation analysis
- * @todo 确定数据结构
- *
- * + 由于是三维情形，所以可以直接用邻接矩阵存储这个图！
- * + 使用map存储数据？
- * + 队中每个节点需要的信息有哪些？rawindex, zone[n]
+ * @todo Data structure for graph?
  */
 
 const int inquene=-1;
@@ -45,11 +41,11 @@ void wrapping(int dim, int width){
     }
     for(i=0;i<size;i++){
         if (site[i]>0){//unvisited site
-            for(ax=0;ax<dim;ax++){//初始化起点的区为{0,0,...,0}
+            for(ax=0;ax<dim;ax++){
                 zone[ax][i]=0;//init to 0
                 wrap[ax]=0;
             }
-            wrapcount=0;//记录有几个方向wrap
+            wrapcount=0;
             q.append(i);
             while(q.notempty()){
                 point=q.pop();

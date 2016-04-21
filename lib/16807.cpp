@@ -28,7 +28,8 @@ double myrand(){
  *  + init<0, reset the seed using current time
  *  + init>=0, reset the seed using init
  *
- * @param go    go iterations to prevent the drawback that time/M is always very small
+ * @param go    go for some iterations to prevent the issue
+ *              that time/M is always very small
  * @return psudo-random number
  */
 void setseed(int init=-1, int go=10){
