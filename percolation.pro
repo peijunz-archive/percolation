@@ -16,4 +16,4 @@ HEADERS += \
 #    lib/nditer.h \
     lib/singlelist.h \
 #    lib/test.h \
-    lib/wrapping.h
+    percolation.h

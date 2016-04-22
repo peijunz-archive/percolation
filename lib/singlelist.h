@@ -23,9 +23,9 @@ public:
     /// Data to save
     T data;
     ///Constructor
-    node():next(0){}
+    node():next(nullptr){}
     ///Constructor with data
-    node(T d):next(0), data(d){}
+    node(T d):next(nullptr), data(d){}
 };
 
 template <typename dtype>
@@ -33,9 +33,8 @@ template <typename dtype>
 class stack{
 public:
     ///Constructor
-    stack():head(0){}
-    ///Destructor
-    ~stack(){
+    stack():head(nullptr){}
+    void clear(){
         node<dtype> *tmp;
         while(head){
             tmp=head;
@@ -43,6 +42,8 @@ public:
             delete tmp;
         }
     }
+    ///Destructor
+    ~stack(){clear();}
     /// Add new data
     void append(dtype d){
         node<dtype> *tmp=new node<dtype>(d);
@@ -75,9 +76,9 @@ template <typename dtype>
 class quene{
 public:
     ///Constructor
-    quene(){tail.next=0;head=&tail;}
+    quene(){tail.next=nullptr;head=&tail;}
     ///Destructor
-    ~quene(){
+    void clear(){
         node<dtype> *tmp;
         while(tail.next){
             tmp=tail.next;
@@ -85,6 +86,7 @@ public:
             delete tmp;
         }
     }
+    ~quene(){clear();}
     /// Add new data
     void append(dtype d){
         head->next=new node<dtype>(d);

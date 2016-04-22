@@ -87,3 +87,33 @@ int benchndarray(int n){
     }
     return a(n/2,n/2);
 }
+/// power a^n by bit operations
+int power(int a, unsigned int n){
+    int p=1;
+    while(n){
+        if(n&1){
+            p*=a;
+        }
+        a*=a;
+        n>>=1;
+    }
+    return p;
+}
+
+int binocut(int n, double p, double cut=0.85){
+    int i;
+    double dist[n+1], q=1-p, sum=0;
+    dist[n]=1;
+    assert(p>0);
+    assert(p<1);
+    for(i=0;i<n;i++){
+        dist[n-i-1]=dist[n-i]*q;
+    }
+    for(i=0;i<n;i++){
+        dist[i+1]=dist[i]*(n-i)*p/(i+1);
+    }
+    for(i=0;i<n+1 && sum<cut;i++){
+        sum+=dist[i];
+    }
+    return i;
+}
