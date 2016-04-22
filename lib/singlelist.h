@@ -1,7 +1,6 @@
 #ifndef SINGLELIST_H
 #define SINGLELIST_H
 #include <iostream>
-#include <stdlib.h>
 /**
  * @file singlelist.h
  * @author zpj

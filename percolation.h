@@ -1,13 +1,14 @@
 #include <iostream>
-#include <stdlib.h>
 #include <cassert>
+#include <vector>
+#include <cstdint>
 #include "16807.h"
 #include "ndarray.h"
 #include "singlelist.h"
 
 using namespace std;
 /**
- * @file wrapping.h
+ * @file percolation.h
  * @author zpj
  * @brief Some code for percolation analysis
  * @todo Data structure for graph?
@@ -20,13 +21,13 @@ template<int N>
  * + No check for overflowing
  */
 struct nbond{
-    char size;
+    unsigned char size;
     char c[2*N];
     nbond():size(0){}
     char & operator[](int i){return c[i];}
     void append(char x){
-        assert(size<=2*N);
-        c[++size]=x;
+        assert(size<2*N);
+        c[size++]=x;
     }
     void clear(){size=0;}
 };
@@ -35,13 +36,19 @@ enum visit{unvisited, inquene, popout};
 inline int sign(int x){
     return (x>=0)?1:-1;
 }
+/**
+ * @brief The combined chars union for small char arrays
+ *
+ * + An char array
+ * + Assignment/Comparation can be parallelize.
+ */
 union combc{
-    char c[4];
-    int a;
+    int8_t c[4];
+    int32_t a;
     combc():a(0){}
-    char & operator[](int i){return c[i];}
-    int & operator=(const int b){return (a=b);}
-    int & operator=(const combc com){a=com.a; return a;}
+    int8_t & operator[](int i){return c[i];}
+    int32_t & operator=(const int b){return (a=b);}
+    int32_t & operator=(const combc com){a=com.a; return a;}
     bool operator==(const combc com){return a==com.a;}
     bool operator!=(const combc com){return a!=com.a;}
 };
@@ -56,14 +63,18 @@ template<int D>
  */
 class ltorus{
     ndarray<nbond<D>> bonds;
-    stack<int> wclus;
+    vector<int> wclus;
 public:
     ltorus(int width){
+        assert(D<=4 && D>1);
         bonds=ndarray<nbond<D>>(D, width);
     }
     void setbond(double prob){
         int near;
         wclus.clear();
+        if(wclus.capacity()>10){
+            wclus.shrink_to_fit();
+        }
         for(int curr=0;curr<bonds.size();curr++){
             bonds[curr].clear();
         }
@@ -79,16 +90,13 @@ public:
     }
     bool wrapping(){
         quene<int> q;                           //quene for BFS
-        ///status for visit, must init
+        //status for visit, must init
         ndarray<char> status(bonds);
         status=unvisited;
-        ///zone for wrapping judgement. Auto init
+        //zone for wrapping judgement. Auto init
         ndarray<combc> zone(bonds);
-        ///Wrapping status for Cluster/Torus
+        //Wrapping status for Cluster/Torus
         bool cwrap=false, twrap=false;
-        /**
-         * @brief delta
-         */
         int delta, curr, near, ax, absax;
         for(int i=0;i<bonds.size();i++){
             if ((status[i]==unvisited) && bonds[i].size){
@@ -113,7 +121,7 @@ public:
                         else if(status[near]==inquene && !cwrap){
                             zone[curr][absax]+=delta;
                             if(zone[near]!=zone[curr]){
-                                wclus.append(i);
+                                wclus.push_back(i);
                                 cwrap=true;
                                 twrap=true;
                             }

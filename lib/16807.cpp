@@ -1,5 +1,6 @@
 #include <iostream>
 #include <ctime>
+#include <cassert>
 using namespace std;
 /**
  * @file 16807.cpp
@@ -16,6 +17,7 @@ int seed=0;
 
 /// Go one step
 double myrand(){
+    assert(seed);
     int ip=A*(seed%q), rp=r*(seed/q);
     if(ip>=rp) seed=ip-rp;
     else seed=ip-rp+M;
