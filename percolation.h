@@ -2,11 +2,14 @@
 #include <cassert>
 #include <vector>
 #include <cstdint>
+#include <opencv/cv.hpp>
 #include "16807.h"
 #include "ndarray.h"
 #include "singlelist.h"
 
+//#define countbd
 using namespace std;
+using namespace cv;
 /**
  * @file percolation.h
  * @author zpj
@@ -63,8 +66,8 @@ template<int D>
  */
 class ltorus{
     ndarray<nbond<D>> bonds;
-    vector<int> wclus;
 public:
+    vector<int> wclus;
     ltorus(int width){
         assert(D<=4 && D>1);
         bonds=ndarray<nbond<D>>(D, width);
@@ -108,9 +111,9 @@ public:
                     status[curr]=popout;
                     for(int ii=0;ii<bonds[curr].size;ii++){
                         ax=bonds[curr][ii];
-                        near=bonds.rollindex(curr,ax);
                         if(ax>=0){delta=1;absax=ax;}
                         else{delta=-1;absax=ax+D;}
+                        near=bonds.rollindex(curr,absax,delta);
                         if(delta==sign(near-curr)) delta=0;
                         if(status[near]==unvisited){
                             zone[near]=zone[curr];//
@@ -125,12 +128,47 @@ public:
                                 cwrap=true;
                                 twrap=true;
                             }
-                            zone[absax][curr]-=delta;//Canceled!
+                            zone[absax][curr]-=delta;
                         }
                     }
                 }
             }
         }
         return twrap;
+    }
+    /**
+     * @brief savetoimg<_Tp1>
+     * @param filename
+     * @param bdlen length of bond
+     *
+     * Save 2D percolation to image using openCV
+     */
+    template<int L>
+    void savetoimg(){
+        int width=bonds.shape(0), ax, sf=L/2, W=width*L;
+        Mat M;
+        assert(L>1);
+        assert(D==2);
+        assert(bonds.size()<1024*1024);
+        ndarray<unsigned char> g(D, W);
+        g=0;
+        for(int i=0;i<width;i++){
+            for(int j=0;j<width;j++){
+                g(L*i+sf,L*j+sf)+=bonds(i,j).size*63;
+                for(int k=0;k<bonds(i,j).size;k++){
+                    ax=bonds(i,j)[k];
+                    if(ax<0) continue;
+                    for(int l=1;l<L;l++){
+                        g((L*i+l*(1-ax)+sf)%W,(L*j+l*ax+sf)%W)=63;
+                    }
+                }
+            }
+        }
+        M=Mat(width*L, width*L, CV_8UC1, g.head);
+        imwrite("test.png",M);
+//        if(show){
+//            imshow("Test", M);
+//            waitKey(0);
+//        }
     }
 };

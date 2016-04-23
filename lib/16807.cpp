@@ -45,3 +45,6 @@ void setseed(int init=-1, int go=10){
         myrand();
     }
 }
+int getseed(){
+    return seed;
+}
