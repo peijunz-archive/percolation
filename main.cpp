@@ -1,7 +1,7 @@
 #include <iostream>
 #include "percolation.h"
 #include <cmath>
-ltorus<2> t(6);
+ltorus<2> t(16);
 /**
  * @brief wrapping probability for a setting
  * @param p     probility for bond setting
@@ -54,9 +54,15 @@ double findmulti(double p, int n=10){
     return s/n;
 }
 int main(){
+    string s("test.png");
+    string s2("debranch.png");
     setseed();
+    t.setbond(0.5);
+    t.savetoimg<5>(s);
+    t.debranch();
+    t.savetoimg<5>(s2);
 //    bisecp(10000);
 //    findmulti(0.486328, 1000);
-    cout<<findmulti(0.457031, 100000)<<endl;
+//    cout<<findmulti(0.457031, 100000)<<endl;
     return 0;
 }

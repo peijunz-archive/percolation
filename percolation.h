@@ -7,7 +7,6 @@
 #include "ndarray.h"
 #include "singlelist.h"
 
-//#define countbd
 using namespace std;
 using namespace cv;
 /**
@@ -33,12 +32,33 @@ struct nbond{
         c[size++]=x;
     }
     void clear(){size=0;}
+    bool del(char ax){
+        bool found=false;
+        for(int i=0;i<size;i++){
+            if(found){
+                c[i-1]=c[i];
+            }
+            if(c[i]==ax){
+                assert(!found);
+                found=true;
+            }
+        }
+        if(found){
+            size--;
+            cout<<"Found!"<<endl;
+        }
+        return found;
+    }
 };
 
 enum visit{unvisited, inquene, popout};
 inline int sign(int x){
     return (x>=0)?1:-1;
 }
+inline char rev(char ax, int D){
+    return (ax<0)?ax+D:ax-D;
+}
+
 /**
  * @brief The combined chars union for small char arrays
  *
@@ -67,6 +87,7 @@ template<int D>
 class ltorus{
     ndarray<nbond<D>> bonds;
 public:
+    /// Wrapped clusters
     vector<int> wclus;
     ltorus(int width){
         assert(D<=4 && D>1);
@@ -91,6 +112,25 @@ public:
             }
         }
     }
+    void deleaf(int leaf){
+        int father;
+        char ax;
+        do{
+            ax=bonds[leaf][0];
+            father=bonds.rollind(leaf, ax, D);
+            bonds[leaf].clear();
+            bonds[father].del(rev(ax, D));
+            leaf=father;
+        }while(bonds[leaf].size==1);
+    }
+    void debranch(){
+        for(int i=0;i<bonds.size();i++){
+            if(bonds[i].size==1){
+                deleaf(i);
+            }
+        }
+    }
+
     bool wrapping(){
         quene<int> q;                           //quene for BFS
         //status for visit, must init
@@ -137,14 +177,14 @@ public:
         return twrap;
     }
     /**
-     * @brief savetoimg<_Tp1>
+     * @brief save 2D matrix to image
      * @param filename
      * @param bdlen length of bond
      *
      * Save 2D percolation to image using openCV
      */
     template<int L>
-    void savetoimg(){
+    void savetoimg(string s){
         int width=bonds.shape(0), ax, sf=L/2, W=width*L;
         Mat M;
         assert(L>1);
@@ -165,7 +205,7 @@ public:
             }
         }
         M=Mat(width*L, width*L, CV_8UC1, g.head);
-        imwrite("test.png",M);
+        imwrite(s,M);
 //        if(show){
 //            imshow("Test", M);
 //            waitKey(0);
