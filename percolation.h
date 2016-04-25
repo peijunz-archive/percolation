@@ -2,11 +2,12 @@
 #include <cassert>
 #include <vector>
 #include <cstdint>
+#include <cmath>
+#include <set>
 #include <opencv/cv.hpp>
 #include "16807.h"
 #include "ndarray.h"
 #include "singlelist.h"
-
 using namespace std;
 using namespace cv;
 /**
@@ -32,33 +33,40 @@ struct nbond{
         c[size++]=x;
     }
     void clear(){size=0;}
-    bool del(char ax){
-        bool found=false;
+    /**
+     * @brief delete a bond at a position
+     * @param pos   position
+     */
+    void del(int pos){
+        for(int i=pos+1;i<size;i++){
+            c[i-1]=c[i];
+        }
+        size--;
+    }
+    /**
+     * @brief find a bond of value ax and then delete
+     * @param ax
+     * @return found or not
+     */
+    bool fdel(char ax){
         for(int i=0;i<size;i++){
-            if(found){
-                c[i-1]=c[i];
-            }
             if(c[i]==ax){
-                assert(!found);
-                found=true;
+                del(i);
+                return true;
             }
         }
-        if(found){
-            size--;
-            cout<<"Found!"<<endl;
-        }
-        return found;
+        return false;
     }
 };
 
-enum visit{unvisited, inquene, popout};
+const int unvisited=-1;
 inline int sign(int x){
     return (x>=0)?1:-1;
 }
 inline char rev(char ax, int D){
     return (ax<0)?ax+D:ax-D;
 }
-
+template<int D>
 /**
  * @brief The combined chars union for small char arrays
  *
@@ -66,15 +74,51 @@ inline char rev(char ax, int D){
  * + Assignment/Comparation can be parallelize.
  */
 union combc{
-    int8_t c[4];
+    int8_t c[D];
     int32_t a;
-    combc():a(0){}
+    combc():a(0){assert((D<=4)&&(D>1));}
+    combc(int32_t init):a(init){assert((D<=4)&&(D>1));}
     int8_t & operator[](int i){return c[i];}
     int32_t & operator=(const int b){return (a=b);}
     int32_t & operator=(const combc com){a=com.a; return a;}
     bool operator==(const combc com){return a==com.a;}
     bool operator!=(const combc com){return a!=com.a;}
+    int32_t operator-(combc &rhs){
+        combc tmp;
+        int sig=0, t;
+        tmp=0;
+        for(int i=0;i<D;i++){
+            if(sig){
+                tmp[i]=sig*(c[i]-rhs[i]);
+            }
+            else{
+                t=c[i]-rhs[i];
+                if(t>0){
+                    sig=1;
+                    tmp[i]=t;
+                }
+                else if(t<0){
+                    sig=-1;
+                    tmp[i]=-t;
+                }
+            }
+        }
+        return tmp.a;
+    }
+    void print(){
+        cout<<"(";
+        for(int i=0;i<D;i++){
+            cout<<(int)c[i]<<", ";
+        }
+        cout<<"\b\b) \n";
+    }
 };
+
+template<int D>
+void printd(int32_t a){
+    combc<D> tmp(a);
+    tmp.print();
+}
 
 template<int D>
 /**
@@ -87,18 +131,14 @@ template<int D>
 class ltorus{
     ndarray<nbond<D>> bonds;
 public:
-    /// Wrapped clusters
-    vector<int> wclus;
+    set<int32_t> wraps;
     ltorus(int width){
         assert(D<=4 && D>1);
         bonds=ndarray<nbond<D>>(D, width);
     }
     void setbond(double prob){
         int near;
-        wclus.clear();
-        if(wclus.capacity()>10){
-            wclus.shrink_to_fit();
-        }
+        wraps.clear();
         for(int curr=0;curr<bonds.size();curr++){
             bonds[curr].clear();
         }
@@ -112,63 +152,78 @@ public:
             }
         }
     }
-    void deleaf(int leaf){
+    int deleaf(int leaf){
         int father;
         char ax;
-        do{
+        while(bonds[leaf].size==1){
             ax=bonds[leaf][0];
             father=bonds.rollind(leaf, ax, D);
             bonds[leaf].clear();
-            bonds[father].del(rev(ax, D));
+            bonds[father].fdel(rev(ax, D));
             leaf=father;
-        }while(bonds[leaf].size==1);
+        }
+        return leaf;
     }
-    void debranch(){
+    void prune(){
         for(int i=0;i<bonds.size();i++){
-            if(bonds[i].size==1){
-                deleaf(i);
-            }
+            deleaf(i);
         }
     }
 
     bool wrapping(){
         quene<int> q;                           //quene for BFS
         //status for visit, must init
-        ndarray<char> status(bonds);
-        status=unvisited;
+        ndarray<int16_t> time(bonds);
+        time=-1;//-1 for unvisited
         //zone for wrapping judgement. Auto init
-        ndarray<combc> zone(bonds);
+        ndarray<combc<D>> zone(bonds);
         //Wrapping status for Cluster/Torus
-        bool cwrap=false, twrap=false;
+        bool twrap=false;
+        int32_t dz;
         int delta, curr, near, ax, absax;
         for(int i=0;i<bonds.size();i++){
-            if ((status[i]==unvisited) && bonds[i].size){
+            if ((time[i]==unvisited) && bonds[i].size){
                 zone[i]=0;
+                time[i]=0;
                 q.append(i);
-                cwrap=false;
                 while(q.notempty()){
                     curr=q.pop();
-                    status[curr]=popout;
                     for(int ii=0;ii<bonds[curr].size;ii++){
                         ax=bonds[curr][ii];
                         if(ax>=0){delta=1;absax=ax;}
                         else{delta=-1;absax=ax+D;}
                         near=bonds.rollindex(curr,absax,delta);
                         if(delta==sign(near-curr)) delta=0;
-                        if(status[near]==unvisited){
-                            zone[near]=zone[curr];//
-                            zone[near][absax]+=delta;//
+                        if(time[near]==unvisited){
+                            zone[near]=zone[curr];
+                            zone[near][absax]+=delta;
+                            time[near]=time[curr]+1;
                             q.append(near);
-                            status[near]=inquene;
                         }
-                        else if(status[near]==inquene && !cwrap){
+                        else if(time[near]>=time[curr]){
                             zone[curr][absax]+=delta;
-                            if(zone[near]!=zone[curr]){
-                                wclus.push_back(i);
-                                cwrap=true;
+                            dz=zone[near]-zone[curr];
+                            if((dz==0)||wraps.count(dz)){
+                                bonds[curr].del(ii);
+                                bonds[near].fdel(rev(ax, D));
+                                ii--;
+                                deleaf(curr);
+                                deleaf(near);
+                            }
+                            else{
+                                cout<<"-----------------------\n";
+                                cout<<">>> From:\n";
+                                bonds.printind(curr);
+                                zone[curr].print();
+                                cout<<">>> To:\n";
+                                bonds.printind(near);
+                                zone[near].print();
+                                wraps.insert(dz);
+                                cout<<">>> Wrapping:\n";
+                                printd<D>(dz);
                                 twrap=true;
                             }
-                            zone[absax][curr]-=delta;
+                            zone[curr][absax]-=delta;
                         }
                     }
                 }
@@ -206,9 +261,5 @@ public:
         }
         M=Mat(width*L, width*L, CV_8UC1, g.head);
         imwrite(s,M);
-//        if(show){
-//            imshow("Test", M);
-//            waitKey(0);
-//        }
     }
 };

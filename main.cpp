@@ -49,18 +49,21 @@ double findmulti(double p, int n=10){
     for(int i=0;i<n;i++){
         t.setbond(p);
         t.wrapping();
-        if(t.wclus.size()>1) s++;
+        if(t.wraps.size()>1) s++;//不太靠谱
     }
     return s/n;
 }
 int main(){
     string s("test.png");
-    string s2("debranch.png");
-    setseed();
+    string s2("pruned.png");
+    string s3("cut.png");
+    setseed(1461604257);
     t.setbond(0.5);
     t.savetoimg<5>(s);
-    t.debranch();
+    t.prune();
     t.savetoimg<5>(s2);
+    cout<<t.wrapping()<<endl;
+    t.savetoimg<5>(s3);
 //    bisecp(10000);
 //    findmulti(0.486328, 1000);
 //    cout<<findmulti(0.457031, 100000)<<endl;
