@@ -1,5 +1,6 @@
 #include <iostream>
 #include <ctime>
+#define NDEBUG
 #include <cassert>
 using namespace std;
 /**
