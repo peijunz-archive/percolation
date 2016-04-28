@@ -67,6 +67,7 @@ struct nbond{
 };
 
 const int unvisited=-100;
+const int visited=100;
 /**
  * @brief The bondtype enum
  *
@@ -120,15 +121,17 @@ public:
      * @brief Prune all the leaves recursively
      */
     void prune(){
-        int father;
+        int start, father;
         char ax;
         for(int i=0;i<bonds.size();i++){
-            while(bonds[start].size==1 && start!=end){
+            start=i;
+            while(bonds[start].size==1){
                 ax=bonds[start][0];
                 father=bonds.rollind(start, ax);
                 setbdtype(start, father, ax, branch);
                 bonds[start].clear();
                 bonds[father].finddelrev(ax);
+                cout<<start<<" to "<<father<<endl;
                 start=father;
             }
         }
@@ -137,15 +140,16 @@ public:
     void goroot(int &a){
         int son=a;
         do{
-            if(fatherax[a]!=unvisited){
-                prev=a;
+            if(fatherax[a]!=visited){
+                son=a;
                 a=father[a];
                 setbdtype(a, son, fatherax[son], nonbrg);
+                fatherax[son]=visited;
             }
             else{
                 a=father[a];
             }
-        }while(bonds[a].size==1);//只记录分叉点！非分叉点意义不大
+        }while(bonds[a].size==1);
     }
 
     /**
@@ -167,10 +171,10 @@ public:
                 goroot(b);
             }
         }
-        for(int i=0;i<sa.size();i++){
+        for(unsigned int i=0;i<sa.size();i++){
             father[sa[i]]=a;
         }
-        for(int i=0;i<sb.size();i++){
+        for(unsigned int i=0;i<sb.size();i++){
             father[sb[i]]=a;
         }
     }
@@ -185,9 +189,8 @@ public:
         quene<int> q;                           //quene for BFS
         time=ndarray<int16_t>(bonds);
         father=ndarray<int>(bonds);
-        incirc=ndarray<char>(bonds);
+        fatherax=ndarray<char>(bonds);
         time=unvisited;
-        fatherax=unvisited;
         int curr, near, ax;
         for(int i=0;i<bonds.size();i++){
             if ((time[i]==unvisited) && bonds[i].size){
@@ -236,12 +239,13 @@ public:
         assert(D==2);
         assert(bonds.size()<1024*1024);
         ndarray<unsigned char> g(D, W);
+        g=0;
         for(int i=0;i<width;i++){
             for(int j=0;j<width;j++){
-                g(L*i+sf,L*j+sf)+=63;//*bonds(i,j).size;
+                g(L*i+sf,L*j+sf)=85;
                 for(int ax=0;ax<D;ax++){
                     for(int l=1;l<L;l++){
-                        g((L*i+l*(1-ax)+sf)%W,(L*j+l*ax+sf)%W)=type[ax](i,j);
+                        g((L*i+l*(1-ax)+sf)%W,(L*j+l*ax+sf)%W)=type[ax](i,j)*85;
                     }
                 }
             }
