@@ -8,14 +8,19 @@
 #include "16807.h"
 #include "ndarray.h"
 #include "singlelist.h"
-using namespace std;
-using namespace cv;
 /**
  * @file percolation.h
  * @author zpj
  * @brief Some code for percolation analysis
- * @todo Data structure for graph?
+ * @todo
+ * + Delete some nonbridge/junctions to simplify the graph
+ * + Add BFS function for count max size for each threshold
  */
+
+using namespace std;
+using namespace cv;
+inline int sign(int x){return (x>=0)?1:-1;}
+
 template<int N>
 /**
  * @brief The near bond struct for N-Dimensional lattice
@@ -48,7 +53,9 @@ struct nbond{
      * @param ax
      * @return found or not
      */
-    bool fdel(char ax){
+    bool finddelrev(char ax){
+        if(ax<0) ax+=N;
+        else ax-=N;
         for(int i=0;i<size;i++){
             if(c[i]==ax){
                 del(i);
@@ -59,67 +66,13 @@ struct nbond{
     }
 };
 
-const int unvisited=-1;
-inline int sign(int x){
-    return (x>=0)?1:-1;
-}
-inline char rev(char ax, int D){
-    return (ax<0)?ax+D:ax-D;
-}
-template<int D>
+const int unvisited=-100;
 /**
- * @brief The combined chars union for small char arrays
+ * @brief The bondtype enum
  *
- * + An char array
- * + Assignment/Comparation can be parallelize.
+ * junction is the default value for a bond
  */
-union combc{
-    int8_t c[D];
-    int32_t a;
-    combc():a(0){assert((D<=4)&&(D>1));}
-    combc(int32_t init):a(init){assert((D<=4)&&(D>1));}
-    int8_t & operator[](int i){return c[i];}
-    int32_t & operator=(const int b){return (a=b);}
-    int32_t & operator=(const combc com){a=com.a; return a;}
-    bool operator==(const combc com){return a==com.a;}
-    bool operator!=(const combc com){return a!=com.a;}
-    int32_t operator-(combc &rhs){
-        combc tmp;
-        int sig=0, t;
-        tmp=0;
-        for(int i=0;i<D;i++){
-            if(sig){
-                tmp[i]=sig*(c[i]-rhs[i]);
-            }
-            else{
-                t=c[i]-rhs[i];
-                if(t>0){
-                    sig=1;
-                    tmp[i]=t;
-                }
-                else if(t<0){
-                    sig=-1;
-                    tmp[i]=-t;
-                }
-            }
-        }
-        return tmp.a;
-    }
-    void print(){
-        cout<<"(";
-        for(int i=0;i<D;i++){
-            cout<<(int)c[i]<<", ";
-        }
-        cout<<"\b\b) \n";
-    }
-};
-
-template<int D>
-void printd(int32_t a){
-    combc<D> tmp(a);
-    tmp.print();
-}
-
+enum bondtype:unsigned char{empty, branch, junction, nonbrg};
 template<int D>
 /**
  * @brief The low dimensional torus class for D<=4
@@ -129,16 +82,22 @@ template<int D>
  * + Use `combc` to save time judging wrapping
  */
 class ltorus{
-    ndarray<nbond<D>> bonds;
+    ndarray<nbond<D>> bonds;///< Rember the bonds by means of near linked list
+    ndarray<unsigned char> type[D];  ///< Rember the type for each bond
+    ndarray<int16_t> time;
+    ndarray<int> father;
+    ndarray<char> fatherax;
 public:
-    set<int32_t> wraps;
     ltorus(int width){
         assert(D<=4 && D>1);
         bonds=ndarray<nbond<D>>(D, width);
+        for(int i=0;i<D;i++){
+            type[i]=ndarray<char>(D, width);
+        }
     }
     void setbond(double prob){
         int near;
-        wraps.clear();
+        for(int i=0;i<D;i++) type[i]=empty;
         for(int curr=0;curr<bonds.size();curr++){
             bonds[curr].clear();
         }
@@ -146,91 +105,122 @@ public:
             for(int ax=0; ax<D; ax++){
                 if(myrand()<prob){
                     near=bonds.rollindex(curr, ax);
+                    type[ax][curr]=junction;
                     bonds[curr].append(ax);
                     bonds[near].append(ax-D);
                 }
             }
         }
     }
-    int deleaf(int leaf){
+    inline void setbdtype(int curr, int dest, char ax, bondtype t){
+        if(ax>=0) type[ax][curr]=t;
+        else type[ax+D][dest]=t;
+    }
+    /**
+     * @brief Prune all the leaves recursively
+     */
+    void prune(){
         int father;
         char ax;
-        while(bonds[leaf].size==1){
-            ax=bonds[leaf][0];
-            father=bonds.rollind(leaf, ax, D);
-            bonds[leaf].clear();
-            bonds[father].fdel(rev(ax, D));
-            leaf=father;
-        }
-        return leaf;
-    }
-    void prune(){
         for(int i=0;i<bonds.size();i++){
-            deleaf(i);
+            while(bonds[start].size==1 && start!=end){
+                ax=bonds[start][0];
+                father=bonds.rollind(start, ax);
+                setbdtype(start, father, ax, branch);
+                bonds[start].clear();
+                bonds[father].finddelrev(ax);
+                start=father;
+            }
         }
     }
 
-    bool wrapping(){
+    void goroot(int &a){
+        int son=a;
+        do{
+            if(fatherax[a]!=unvisited){
+                prev=a;
+                a=father[a];
+                setbdtype(a, son, fatherax[son], nonbrg);
+            }
+            else{
+                a=father[a];
+            }
+        }while(bonds[a].size==1);//只记录分叉点！非分叉点意义不大
+    }
+
+    /**
+     * @brief backtrace to the highest root for a and b
+     * @param l1 leaf 1
+     * @param l2 leaf 2
+     *
+     * For performance, after backtracing, it will set new root
+     */
+    void backtrace(int a, int b){
+        vector<int> sa, sb;
+        while(a!=b){
+            if(time[a]>=time[b]){
+                sa.push_back(a);
+                goroot(a);
+            }
+            else{
+                sb.push_back(b);
+                goroot(b);
+            }
+        }
+        for(int i=0;i<sa.size();i++){
+            father[sa[i]]=a;
+        }
+        for(int i=0;i<sb.size();i++){
+            father[sb[i]]=a;
+        }
+    }
+
+    /**
+     * @brief Identify junctions and then delete it
+     *
+     * A semi-destructive process:
+     * + Will turn the undirected graph into directed graph
+     */
+    void dejunct(){
         quene<int> q;                           //quene for BFS
-        //status for visit, must init
-        ndarray<int16_t> time(bonds);
-        time=-1;//-1 for unvisited
-        //zone for wrapping judgement. Auto init
-        ndarray<combc<D>> zone(bonds);
-        //Wrapping status for Cluster/Torus
-        bool twrap=false;
-        int32_t dz;
-        int delta, curr, near, ax, absax;
+        time=ndarray<int16_t>(bonds);
+        father=ndarray<int>(bonds);
+        incirc=ndarray<char>(bonds);
+        time=unvisited;
+        fatherax=unvisited;
+        int curr, near, ax;
         for(int i=0;i<bonds.size();i++){
             if ((time[i]==unvisited) && bonds[i].size){
-                zone[i]=0;
                 time[i]=0;
+                father[i]=unvisited;
                 q.append(i);
                 while(q.notempty()){
                     curr=q.pop();
                     for(int ii=0;ii<bonds[curr].size;ii++){
                         ax=bonds[curr][ii];
-                        if(ax>=0){delta=1;absax=ax;}
-                        else{delta=-1;absax=ax+D;}
-                        near=bonds.rollindex(curr,absax,delta);
-                        if(delta==sign(near-curr)) delta=0;
+                        near=bonds.rollind(curr,ax);
+                        bonds[near].finddelrev(ax);
                         if(time[near]==unvisited){
-                            zone[near]=zone[curr];
-                            zone[near][absax]+=delta;
                             time[near]=time[curr]+1;
                             q.append(near);
+                            father[near]=curr;
                         }
-                        else if(time[near]>=time[curr]){
-                            zone[curr][absax]+=delta;
-                            dz=zone[near]-zone[curr];
-                            if((dz==0)||wraps.count(dz)){
-                                bonds[curr].del(ii);
-                                bonds[near].fdel(rev(ax, D));
-                                ii--;
-                                deleaf(curr);
-                                deleaf(near);
-                            }
-                            else{
-                                cout<<"-----------------------\n";
-                                cout<<">>> From:\n";
-                                bonds.printind(curr);
-                                zone[curr].print();
-                                cout<<">>> To:\n";
-                                bonds.printind(near);
-                                zone[near].print();
-                                wraps.insert(dz);
-                                cout<<">>> Wrapping:\n";
-                                printd<D>(dz);
-                                twrap=true;
-                            }
-                            zone[curr][absax]-=delta;
+                        else{
+                            setbdtype(curr, near, ax, nonbrg);
+                            backtrace(near, curr);
                         }
                     }
                 }
             }
         }
-        return twrap;
     }
+    /**
+     * @brief Count the max cluster if only take bonds larger than th into
+     *  consideration
+     * @param th    threshold, should be empty, branch, junction
+     * @return  the size of the biggest cluster
+     */
+    int count(bondtype th);
     /**
      * @brief save 2D matrix to image
      * @param filename
@@ -240,21 +230,18 @@ public:
      */
     template<int L>
     void savetoimg(string s){
-        int width=bonds.shape(0), ax, sf=L/2, W=width*L;
+        int width=bonds.shape(0), sf=L/2, W=width*L;
         Mat M;
         assert(L>1);
         assert(D==2);
         assert(bonds.size()<1024*1024);
         ndarray<unsigned char> g(D, W);
-        g=0;
         for(int i=0;i<width;i++){
             for(int j=0;j<width;j++){
-                g(L*i+sf,L*j+sf)+=bonds(i,j).size*63;
-                for(int k=0;k<bonds(i,j).size;k++){
-                    ax=bonds(i,j)[k];
-                    if(ax<0) continue;
+                g(L*i+sf,L*j+sf)+=63;//*bonds(i,j).size;
+                for(int ax=0;ax<D;ax++){
                     for(int l=1;l<L;l++){
-                        g((L*i+l*(1-ax)+sf)%W,(L*j+l*ax+sf)%W)=63;
+                        g((L*i+l*(1-ax)+sf)%W,(L*j+l*ax+sf)%W)=type[ax](i,j);
                     }
                 }
             }
