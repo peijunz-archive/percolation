@@ -16,4 +16,6 @@ HEADERS += \
     lib/ndarray.h \
     lib/singlelist.h \
     lib/nbond.h \
-    percolation.h
+    lib/zone.h \
+    classify.h\
+    wrapping.h

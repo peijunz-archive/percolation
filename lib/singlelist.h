@@ -2,8 +2,7 @@
 #define SINGLELIST_H
 #include <iostream>
 /**
- * @file singlelist.h
- * @author zpj
+ * @internal
  * @brief Data structure of uni-directional list: quene and stack
  ***/
 

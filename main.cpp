@@ -1,5 +1,5 @@
 #include <iostream>
-#include "percolation.h"
+#include "classify.h"
 ltorus<2> t(128);
 int main(){
 //    string s("vinilla.png");
@@ -10,6 +10,6 @@ int main(){
     t.setbond(0.5);
     t.prune();
     t.dejunct();
-    t.savetoimg<10>(s3, c);
+    t.savetoimg<5>(s3, c);
     return 0;
 }

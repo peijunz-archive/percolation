@@ -1,6 +1,8 @@
 #ifndef NBOND_H
 #define NBOND_H
-
+#include <cstdint>
+#define NDEBUG
+#include <cassert>
 template<int D>
 /**
  * @brief The near bond struct for N-Dimensional lattice

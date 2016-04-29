@@ -9,18 +9,14 @@
 #include "nbond.h"
 #include "singlelist.h"
 /**
- * @file percolation.h
+ * @file classify.h
  * @author zpj
- * @brief Some code for percolation analysis
- * @todo
- * + Merge the wrapping branch
- * + Count max size for each path threshold
+ * @brief Some code for bond classification in percolation
+ * @todo Count max size for each path threshold
  */
 
 using namespace std;
 using namespace cv;
-
-
 
 enum bondtype:uint8_t{
     empty=0,    ///< No bond here
@@ -46,13 +42,10 @@ class ltorus{
     ndarray<int16_t> time;      ///< time for BFS
     ndarray<int> father;        ///< Father node for backtracing
     ndarray<int8_t> fatherax;   ///< The axis from which the father come
-    int numbranch;
-    int numjunct;
-    int numnonbrg;
-    int numbond;
+    int count[4];
 public:
     ltorus(int width){
-        assert(D<=4 && D>1);
+        assert(D<=8 && D>1);
         bonds=ndarray<nbond<D>>(D, width);
         for(int i=0;i<D;i++){
             type[i]=ndarray<int8_t>(D, width);
@@ -66,7 +59,7 @@ public:
      */
     void setbond(double prob){
         int near;
-        numbond=numbranch=numnonbrg=numjunct=0;
+        count[0]=0;
         for(int i=0;i<D;i++) type[i]=empty;
         for(int curr=0;curr<bonds.size();curr++){
             bonds[curr].clear();
@@ -76,7 +69,7 @@ public:
                 if(myrand()<prob){
                     near=bonds.rollindex(curr, ax);
                     type[ax][curr]=junction;
-                    numbond++;
+                    count[0]++;
                     bonds[curr].append(ax);
                     bonds[near].append(ax-D);
                 }
@@ -90,7 +83,7 @@ public:
      * @param ax    axis to go
      * @param t     type
      */
-    inline void setbdtype(int curr, int dest, int8_t ax, bondtype t){
+    inline void settype(int curr, int dest, int8_t ax, bondtype t){
         if(ax>=0) type[ax][curr]=t;
         else type[ax+D][dest]=t;
     }
@@ -105,8 +98,8 @@ public:
             while(bonds[start].size==1){
                 ax=bonds[start][0];
                 father=bonds.rollind(start, ax);
-                setbdtype(start, father, ax, branch);
-                numbranch++;
+                settype(start, father, ax, branch);
+                count[branch]++;
                 bonds[start].clear();
                 bonds[father].finddelrev(ax);
                 start=father;
@@ -125,8 +118,8 @@ public:
             if(fatherax[a]!=marked){
                 son=a;
                 a=father[a];
-                setbdtype(a, son, fatherax[son], nonbrg);
-                numnonbrg++;
+                settype(a, son, fatherax[son], nonbrg);
+                count[nonbrg]++;
                 fatherax[son]=marked;
             }
             else{
@@ -193,26 +186,25 @@ public:
                             fatherax[near]=ax;
                         }
                         else{
-                            setbdtype(curr, near, ax, nonbrg);
-                            numnonbrg++;
+                            settype(curr, near, ax, nonbrg);
+                            count[nonbrg]++;
                             backtrace(near, curr);
                         }
                     }
                 }
             }
         }
-        numjunct=numbond-numbranch-numnonbrg;
+        count[junction]=count[0]-count[branch]-count[nonbrg];
     }
     /**
-     * @brief Get the ratio for each bond type
+     * @brief Get the number for each bond type
      */
-    void getratio(){
-        double S=bonds.size()*D;
-        cout<<"总\t"<<bonds.size()*D<<"\t"<<1<<endl;
-        cout<<"键\t"<<numbond<<"\t"<<numbond/S<<endl;
-        cout<<"枝\t"<<numbranch<<"\t"<<numbranch/S<<endl;
-        cout<<"结\t"<<numjunct<<"\t"<<numjunct/S<<endl;
-        cout<<"环\t"<<numnonbrg<<"\t"<<numnonbrg/S<<endl;
+    void bondcount(){
+        cout<<bonds.size()*D;
+        for(int i=0; i<4; i++){
+            cout<<"\t"<<count[i];
+        }
+        cout<<endl;
     }
 
     /**
@@ -221,7 +213,7 @@ public:
      * @param th    threshold, should be empty, branch, junction
      * @return  The size of the biggest cluster
      */
-    int count(bondtype th);
+    int maxclus(bondtype th);
     /**
      * @brief Save 2D percolation with bond classification to image using openCV
      * @param filename

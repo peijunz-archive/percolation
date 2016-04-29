@@ -5,11 +5,11 @@
 using namespace std;
 /**
  * @file 16807.cpp
- * @author zpj
  * @brief 16807 psudo-random number generator
  *
+ *
  * See [Lehmer random number generator](https://en.wikipedia.org/wiki/
- * Lehmer_random_number_generator)
+ * Lehmer_random_number_generator) for more details
  */
 /// M=2^31-1
 const int M=2147483647;
@@ -48,6 +48,10 @@ void setseed(int init=-1, int go=10){
         myrand();
     }
 }
+/**
+ * @brief Get the current seed for reproduction
+ * @return current seed
+ */
 int getseed(){
     return seed;
 }
