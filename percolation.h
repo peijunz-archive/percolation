@@ -266,13 +266,12 @@ public:
     int count(bondtype th);
     /**
      * @brief save 2D matrix to image
-     * @param filename
-     * @param bdlen length of bond
+     * @param s     filename
      *
      * Save 2D percolation to image using openCV
      */
     template<int L>
-    void savetoimg(string s){
+    void savetoimg(string s, uint8_t * col=tocolor){
         int width=bonds.shape(0), sf=L/2, W=width*L;
         Mat M;
         assert(L>1);
@@ -286,7 +285,7 @@ public:
                 for(int ax=0;ax<D;ax++){
                     for(int l=1;l<L;l++){
                         g((L*i+l*(1-ax)+sf)%W,(L*j+l*ax+sf)%W)\
-                                =tocolor[type[ax](i,j)];
+                                =col[type[ax](i,j)];
                     }
                 }
             }
