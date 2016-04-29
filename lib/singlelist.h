@@ -5,7 +5,6 @@
  * @file singlelist.h
  * @author zpj
  * @brief Data structure of uni-directional list: quene and stack
- * @bug No
  ***/
 
 using namespace std;
@@ -60,7 +59,7 @@ public:
             delete tmp;
             return d;
         }
-        cerr<<endl<<"ERROR in stack.pop():\tAlready EMPTY"<<endl;
+        cerr<<"ERROR in stack.pop():\tAlready EMPTY"<<endl;
         exit(0);
     }
     ///Judge if the stack is empty
@@ -105,7 +104,7 @@ public:
             delete tmp;
             return d;
         }
-        cerr<<endl<<"ERROR in quene.pop():\tAlready EMPTY"<<endl;
+        cerr<<"ERROR in quene.pop():\tAlready EMPTY"<<endl;
         exit(0);
     }
     /// Judge if the quene is empty

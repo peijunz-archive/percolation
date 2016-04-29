@@ -1,7 +1,6 @@
 #include <iostream>
 #include "percolation.h"
-#include <cmath>
-ltorus<2> t(16);
+ltorus<2> t(128);
 int main(){
 //    string s("vinilla.png");
 //    string s2("pruned.png");
@@ -11,6 +10,6 @@ int main(){
     t.setbond(0.5);
     t.prune();
     t.dejunct();
-    t.savetoimg<5>(s3, c);
+    t.savetoimg<10>(s3, c);
     return 0;
 }

@@ -15,4 +15,5 @@ HEADERS += \
     lib/16807.h \
     lib/ndarray.h \
     lib/singlelist.h \
+    lib/nbond.h \
     percolation.h
