@@ -12,7 +12,7 @@
 using namespace std;
 using namespace cv;
 /**
- * @file percolation.h
+ * @file wrapping.h
  * @author zpj
  * @brief Some code for percolation analysis
  * @todo Data structure for graph?
@@ -60,7 +60,7 @@ public:
                 ax=bonds[leaf][0];
                 father=bonds.rollind(leaf, ax);
                 bonds[leaf].clear();
-                bonds[father].finddelrev(rev(ax, D));
+                bonds[father].finddelrev(ax);
                 leaf=father;
             }
         }
@@ -72,9 +72,10 @@ public:
         zone<D> dz;
         int curr, near;
         int8_t delta, ax, absax;
+        prune();
         visit=0;   // 0 for unvisited
         for(int i=0;i<bonds.size();i++){
-            if ((time[i]==unvisited) && bonds[i].size){
+            if (!visit[i] && bonds[i].size){
                 z[i]=0;
                 visit[i]=1;
                 q.append(i);
@@ -96,8 +97,8 @@ public:
                         else{
                             z[curr][absax]+=delta;
                             dz=z[near]-z[curr];
-                            if(dz.a!=0){
-                                ii--;
+                            if(dz!=0){
+                                return true;
                             }
                             z[curr][absax]-=delta;
                         }
@@ -105,17 +106,16 @@ public:
                 }
             }
         }
-        return twrap;
+        return false;
     }
+    template<int L>
     /**
      * @brief save 2D matrix to image
      * @param filename
-     * @param bdlen length of bond
      *
      * Save 2D percolation to image using openCV
      */
-    template<int L>
-    void savetoimg(string s){
+    void savetoimg(string filename){
         int width=bonds.shape(0), ax, sf=L/2, W=width*L;
         Mat M;
         assert(L>1);
@@ -135,6 +135,40 @@ public:
             }
         }
         M=Mat(width*L, width*L, CV_8UC1, g.head);
-        imwrite(s,M);
+        imwrite(filename,M);
     }
 };
+template<int D>
+/**
+ * @brief wrapping probability for a setting
+ * @param p     probility for bond setting
+ * @param n     time of iteration
+ * @return wrapping probability
+ */
+double wrapprob(wtorus<D> &t, double p, int n=100){
+    double count=0;
+    for(int i=0;i<n;i++){
+        t.setbond(p);
+        count+=t.wrapping();
+    }
+    return count/n;
+}
+template<int D>
+/**
+ * @brief bisectional method for finding a setting for given wrapping prob
+ * @param n     time of iteration
+ * @param y0    the given wrapping prob
+ * @return bond setting
+ */
+double bisecp(wtorus<D> &t, int n, double y0=0.5){
+    double xl=0, xr=1, xc=0, err=1/sqrt(n);
+    double yc=0;
+    while(fabs(yc-y0)>err){
+        xc=(xl+xr)/2;
+        yc=wrapprob(t, xc, n);
+        if(yc>y0) xr=xc;
+        else xl=xc;
+        cout<<"x="<<xc<<"\tdy="<<yc-y0<<endl;
+    }
+    return xc;
+}
