@@ -23,17 +23,13 @@ inline int sign(int x){
 
 template<int D>
 /**
- * @brief The low dimensional torus class for D<=4
- *
- * + For low dimensional torus, the bonds can be saved by nbond
- *   whose size is only 2D+1 byte
- * + Use `combc` to save time judging wrapping
+ * @brief wrapping torus
+ * + Use `zone` to save zone information to judge wrapping
  */
 class wtorus{
     ndarray<nbond<D>> bonds;
 public:
     wtorus(int width){
-        assert(D<=4 && D>1);
         bonds=ndarray<nbond<D>>(D, width);
     }
     void setbond(double prob){
@@ -69,10 +65,9 @@ public:
         quene<int> q;
         ndarray<uint8_t> visit(bonds);
         ndarray<zone<D>> z(bonds);
-        zone<D> dz;
+        typename zone<D>::intD_t dz;
         int curr, near;
         int8_t delta, ax, absax;
-        prune();
         visit=0;   // 0 for unvisited
         for(int i=0;i<bonds.size();i++){
             if (!visit[i] && bonds[i].size){
@@ -108,7 +103,7 @@ public:
         }
         return false;
     }
-    template<int L>
+    template<unsigned int L>
     /**
      * @brief save 2D matrix to image
      * @param filename

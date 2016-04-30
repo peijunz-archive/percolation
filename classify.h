@@ -29,7 +29,7 @@ enum bondtype:uint8_t{
 /// Default color scheme for bond
 uint8_t tocolor[4]={0, 64, 255, 128};
 
-template<int D>
+template<unsigned int D>
 /**
  * @brief The low dimensional torus class for D<=4
  *
@@ -45,7 +45,6 @@ class ltorus{
     int count[4];
 public:
     ltorus(int width){
-        assert(D<=8 && D>1);
         bonds=ndarray<nbond<D>>(D, width);
         for(int i=0;i<D;i++){
             type[i]=ndarray<int8_t>(D, width);
@@ -93,6 +92,7 @@ public:
     void prune(){
         int start, father;
         int8_t ax;
+        count[branch]=0;
         for(int i=0;i<bonds.size();i++){
             start=i;
             while(bonds[start].size==1){
@@ -169,6 +169,7 @@ public:
         fatherax=ndarray<int8_t>(bonds);
         time=-1;
         int curr, near, ax;
+        count[nonbrg]=0;
         for(int i=0;i<bonds.size();i++){
             if ((time[i]<0) && bonds[i].size){
                 time[i]=0;
@@ -219,7 +220,7 @@ public:
      * @param filename
      * @param col   Color scheme for bondtype
      */
-    template<int L>
+    template<unsigned int L>
     void savetoimg(string filename, uint8_t *col=tocolor){
         int width=bonds.shape(0), sf=L/2, W=width*L;
         Mat M;

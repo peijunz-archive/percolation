@@ -1,7 +1,5 @@
 #include <iostream>
 #include <ctime>
-#define NDEBUG
-#include <cassert>
 using namespace std;
 /**
  * @file 16807.cpp
@@ -11,16 +9,13 @@ using namespace std;
  * See [Lehmer random number generator](https://en.wikipedia.org/wiki/
  * Lehmer_random_number_generator) for more details
  */
-/// M=2^31-1
-const int M=2147483647;
-/// A=7^5
-const int A=16807;
-const int q=M/A, r=M%A;
+const unsigned int M=(1u<<31)-1;
+const unsigned int A=16807;
+const unsigned int q=M/A, r=M%A;
 int seed=0;
 
 /// Go one step
 double myrand(){
-    assert(seed);
     int ip=A*(seed%q), rp=r*(seed/q);
     if(ip>=rp) seed=ip-rp;
     else seed=ip-rp+M;

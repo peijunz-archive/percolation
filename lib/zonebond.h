@@ -1,8 +1,64 @@
-#ifndef NBOND_H
-#define NBOND_H
+#ifndef ZONEBOND_H
+#define ZONEBOND_H
+#include <iostream>
 #include <cstdint>
-#define NDEBUG
-#include <cassert>
+
+template<int N, bool C=true>
+struct least{
+    typedef typename least<N+(N<9 && N>1), (N<9 && N>1)>::_int _int;
+};
+template<int N>
+struct least<N, false>{
+    typedef void _int;
+};
+
+template<bool C>
+struct least<2, C>{
+    typedef int16_t _int;
+};
+template<bool C>
+struct least<4, C>{
+    typedef int32_t _int;
+};
+template<bool C>
+struct least<8, C>{
+    typedef int64_t _int;
+};
+
+template<int D>
+/**
+ * @brief The combined chars union for small char arrays(D<=4)
+ *
+ * + An char array
+ * + Assignment/Comparation can be parallelize.
+ */
+union zone{
+    typedef typename least<D>::_int intD_t;
+    int8_t c[D];
+    intD_t a;
+    zone():a(0){}
+    zone(intD_t init):a(init){}
+    int8_t & operator[](int i){return c[i];}
+    intD_t & operator=(const int b){return (a=b);}
+    intD_t & operator=(const zone com){a=com.a; return a;}
+    bool operator==(const zone com){return a==com.a;}
+    bool operator!=(const zone com){return a!=com.a;}
+    intD_t operator-(zone &rhs){
+        zone tmp;
+        for(int i=0;i<D;i++){
+            tmp[i]=c[i]-rhs[i];
+        }
+        return tmp.a;
+    }
+    void print(){
+        for(int i=0;i<D;i++){
+            cout<<c[i]<<"\t";
+        }
+        cout<<endl;
+    }
+};
+
+
 template<int D>
 /**
  * @brief The near bond struct for N-Dimensional lattice
@@ -26,7 +82,6 @@ struct nbond{
     nbond():size(0){}
     int8_t & operator[](int i){return c[i];}
     void append(int8_t x){
-        assert(size<2*D);
         c[size++]=x;
     }
     void clear(){size=0;}
@@ -57,5 +112,4 @@ struct nbond{
         return false;
     }
 };
-
-#endif //NBOND_H
+#endif //ZONEBOND_H

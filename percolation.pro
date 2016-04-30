@@ -15,7 +15,6 @@ HEADERS += \
     lib/16807.h \
     lib/ndarray.h \
     lib/singlelist.h \
-    lib/nbond.h \
-    lib/zone.h \
+    lib/zonebond.h \
     classify.h\
     wrapping.h
