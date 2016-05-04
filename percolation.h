@@ -2,12 +2,12 @@
 #include <vector>
 #include <cstdint>
 #include <cmath>
+#include <queue>
 #include "16807.h"
 #include "ndarray.h"
 #include "zonebond.h"
-#include "singlelist.h"
 /**
- * @file classify.h
+ * @file percolation.h
  * @author zpj
  * @brief Some code for bond classification in percolation
  * @todo Remember bond type without using other method like backtracing tree?
@@ -75,17 +75,6 @@ public:
             }
         }
     }
-//    /**
-//     * @brief Set bond type
-//     * @param curr  current point
-//     * @param dest  destination
-//     * @param ax    axis to go
-//     * @param t     type
-//     */
-//    inline void settype(int curr, int dest, int8_t ax, bondtype t){
-//        if(ax>=0) type[ax][curr]=t;
-//        else type[ax+D][dest]=t;
-//    }
     /**
      * @brief Prune all the leaves recursively
      *
@@ -180,7 +169,7 @@ public:
      * + Will turn the undirected graph into directed
      */
     void dejunct(){
-        quene<int> q;
+        queue<int> q;
         int curr, near, ax, currclus, currbfree;
         for(int i=0;i<bonds.size();i++){
             if ((time[i]==0) && bonds[i].size){
@@ -188,9 +177,9 @@ public:
                 currclus=cumleaf[i];
                 fatherax[i]=0;
                 currbfree=0;
-                q.append(i);
-                while(q.notempty()){
-                    curr=q.pop();
+                q.push(i);
+                while(!q.empty()){
+                    curr=q.front();
                     for(int ii=0;ii<bonds[curr].size;ii++){
                         ax=bonds[curr][ii];
                         near=bonds.rollind(curr,ax);
@@ -199,7 +188,7 @@ public:
                         currclus+=cumleaf[near]+1;
                         if(time[near]==0){
                             time[near]=time[curr]+1;
-                            q.append(near);
+                            q.push(near);
                             father[near]=curr;
                             fatherax[near]=ax;
                         }
@@ -209,6 +198,7 @@ public:
                             backtrace(near, curr);
                         }
                     }
+                    q.pop();
                 }
                 if(maxlfree<currbfree) maxlfree=currbfree;
                 if(maxclus<currclus) maxclus=currclus;
@@ -268,7 +258,7 @@ public:
         }
     }
     int wrapping(){
-        quene<int> q;
+        queue<int> q;
         ndarray<uint8_t> visit(bonds);
         ndarray<zone<D>> z(bonds);
         typename zone<D>::intD_t dz;
@@ -282,9 +272,9 @@ public:
             if (!visit[i] && bonds[i].size){
                 z[i]=0;
                 visit[i]=1;
-                q.append(i);
-                while(q.notempty()){
-                    curr=q.pop();
+                q.push(i);
+                while(!q.empty()){
+                    curr=q.front();
                     for(int ii=0;ii<bonds[curr].size;ii++){
                         ax=bonds[curr][ii];
                         if(ax>=0){delta=1;absax=ax;}
@@ -296,7 +286,7 @@ public:
                             z[near]=z[curr];
                             z[near][absax]+=delta;
                             visit[near]=1;
-                            q.append(near);
+                            q.push(near);
                         }
                         else{
                             z[curr][absax]+=delta;
@@ -311,6 +301,7 @@ public:
                             z[curr][absax]-=delta;
                         }
                     }
+                    q.pop();
                 }
             }
         }
@@ -320,6 +311,7 @@ public:
 template<int D>
 /**
  * @brief wrapping probability for a setting
+ * @param t     Torus
  * @param p     probility for bond setting
  * @param n     time of iteration
  * @return wrapping probability
@@ -335,6 +327,7 @@ double wrapprob(wtorus<D> &t, double p, int n=100){
 template<int D>
 /**
  * @brief bisectional method for finding a setting for given wrapping prob
+ * @param t     Torus
  * @param n     time of iteration
  * @param y0    the given wrapping prob
  * @return bond setting

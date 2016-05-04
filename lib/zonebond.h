@@ -12,6 +12,7 @@ enum bondtype:uint8_t{
 };
 
 template<int N, bool C=true>
+/// Int of at least given size
 struct least{
     typedef typename least<N+(N<9 && N>1), (N<9 && N>1)>::_int _int;
 };

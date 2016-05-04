@@ -14,7 +14,6 @@ SOURCES += main.cpp \
 HEADERS += \
     lib/16807.h \
     lib/ndarray.h \
-    lib/singlelist.h \
     lib/zonebond.h \
     lib/save2dimg.h\
     percolation.h
