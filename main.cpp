@@ -1,13 +1,16 @@
 #include <iostream>
 using namespace std;
-#include "classify.h"
-#include "wrapping.h"
+#define WRAPONCE
+#include "percolation.h"
+//#include "save2dimg.h"
 int main(){
-    wtorus<2> t(128);
-    cout<<(1u<<31)-1<<endl;
+    ctorus<2> t(128);
     setseed();
-    t.setbond(0.5);
-    t.prune();
-    cout<<t.wrapping()<<endl;
+    for(int i=0;i<1000;i++){
+        t.setbond(0.5);
+        t.prune();
+        t.dejunct();
+        t.bondcount();
+    }
     return 0;
 }

@@ -3,6 +3,14 @@
 #include <iostream>
 #include <cstdint>
 
+enum bondtype:uint8_t{
+    empty=0,    ///< No bond here
+    branch=1,   ///< Branch, identify by recursive cutting leaf
+    junction=2, ///< Junction, default value for any bond
+    nonbrg=3,   ///< A bond without which the cluster is still connected
+    marked=64   ///< Mark to replace axis if a point is backtraced.
+};
+
 template<int N, bool C=true>
 struct least{
     typedef typename least<N+(N<9 && N>1), (N<9 && N>1)>::_int _int;
