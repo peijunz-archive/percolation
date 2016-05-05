@@ -161,7 +161,6 @@ public:
         if(maxbfree<cumbfree[a]) maxbfree=cumbfree[a];
         s.clear();
     }
-
     /**
      * @brief Identify junctions and then delete it
      *
@@ -206,12 +205,10 @@ public:
             }
         }
     }
-    /**
-     * @brief Get the number for each bond type
-     */
+    /// Get the number for each bond type
     void bondcount(){
-        cout<<bonds.size()*D<<'\t';
-        cout<<countclus<<'\t'<<countlfree<<'\t'<<countbfree<<'\t';
+        cout<<countclus<<'\t'<<countclus-countlfree<<'\t';
+        cout<<countlfree-countbfree<<'\t'<<countbfree<<'\t';
         cout<<maxclus<<'\t'<<maxlfree<<'\t'<<maxbfree<<endl;
     }
 };

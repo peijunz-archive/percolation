@@ -36,20 +36,23 @@ struct least<8, C>{
 
 template<int D>
 /**
- * @brief The combined chars union for small char arrays(D<=4)
+ * @brief The combined chars union for small char arrays
  *
  * + An char array
+ * + For `2<=D<=9
  * + Assignment/Comparation can be parallelize.
  */
 union zone{
+private:
     typedef typename least<D>::_int intD_t;
+public:
     int8_t c[D];
     intD_t a;
     zone():a(0){}
     zone(intD_t init):a(init){}
     int8_t & operator[](int i){return c[i];}
     intD_t & operator=(const int b){return (a=b);}
-    intD_t & operator=(const zone com){a=com.a; return a;}
+    intD_t & operator=(const zone &com){a=com.a; return a;}
     bool operator==(const zone com){return a==com.a;}
     bool operator!=(const zone com){return a!=com.a;}
     intD_t operator-(zone &rhs){
