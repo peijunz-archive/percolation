@@ -169,22 +169,23 @@ public:
      */
     void dejunct(){
         queue<int> q;
-        int curr, near, ax, currclus, currbfree;
+        int curr, near, ax, currclus, currlfree;
         for(int i=0;i<bonds.size();i++){
             if ((time[i]==0) && bonds[i].size){
                 time[i]++;
-                currclus=cumleaf[i];
                 fatherax[i]=0;
-                currbfree=0;
+                currclus=0;
+                currlfree=0;
                 q.push(i);
                 while(!q.empty()){
                     curr=q.front();
+                    currclus+=cumleaf[curr];
                     for(int ii=0;ii<bonds[curr].size;ii++){
+                        currlfree++;
+                        currclus++;
                         ax=bonds[curr][ii];
                         near=bonds.rollind(curr,ax);
                         bonds[near].finddelrev(ax);
-                        currbfree++;
-                        currclus+=cumleaf[near]+1;
                         if(time[near]==0){
                             time[near]=time[curr]+1;
                             q.push(near);
@@ -199,9 +200,9 @@ public:
                     }
                     q.pop();
                 }
-                if(maxlfree<currbfree) maxlfree=currbfree;
+                if(maxlfree<currlfree) maxlfree=currlfree;
                 if(maxclus<currclus) maxclus=currclus;
-                countlfree+=currbfree;
+                countlfree+=currlfree;
             }
         }
     }

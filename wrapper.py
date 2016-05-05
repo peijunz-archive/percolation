@@ -9,7 +9,7 @@ def gendata(width, times, prob):
     '''Generate classification data for given percolation configuration'''
     assert((width>5) and (times>0) and (0<prob<1))
     os.system('echo "%d %d %f"|%s > %s'%(width, times, prob, prgpath, genfname(width)))
-    return 0
+    print("Completed! "+genfname(width))
 def getdata(width, i=-1):
     '''Retrieve data from data file and extract a portion'''
     A=loadtxt(genfname(width), skiprows=4).T
