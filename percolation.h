@@ -37,12 +37,8 @@ public:
     uint maxbfree;               ///< The biggest bridge-free cluster
     uint countbfree;             ///< The Total bridge-free cluster
     ndarray<nbond<D>> bonds;     ///< Rember the bonds by means of list
-//    ndarray<uint8_t> type[D];   ///< Rember the type for each bond by matrix
     ctorus(uint width){
         bonds=ndarray<nbond<D>>(D, width);
-//        for(uint i=0;i<D;i++){
-//            type[i]=ndarray<int8_t>(D, width);
-//        }
         cumleaf=ndarray<uint16_t>(bonds);
         cumbfree=ndarray<uint32_t>(bonds);
         time=ndarray<uint16_t>(bonds);
@@ -57,7 +53,6 @@ public:
      */
     void setbond(double prob){
         uint near;
-//        for(uint i=0;i<D;i++) type[i]=empty;
         maxclus=maxlfree=maxbfree=countclus=countlfree=countbfree=0;
         cumleaf=0;
         cumbfree=0;
@@ -69,7 +64,6 @@ public:
             for(uint ax=0; ax<D; ax++){
                 if(myrand()<prob){
                     near=bonds.rollindex(curr, ax);
-//                    type[ax][curr]=junction;
                     countclus++;
                     bonds[curr].append(ax);
                     bonds[near].append(ax-D);
@@ -77,6 +71,26 @@ public:
             }
         }
     }
+    void densify(){
+        uint8_t tmp(bonds);
+        for(uint i=0;i<bonds.size();i++){
+            tmp[i]=bonds[i].size;
+            bonds[i].clear();
+        }
+        for(uint curr=0;curr<bonds.size();curr++){
+            if(tmp[curr]){
+                for(uint ax=0;ax<D;ax++){
+                    near=bonds.rollindex(curr, ax);
+                    if(tmp[near]){
+                        bonds[curr].append(ax);
+                        bonds[near].append(ax-D);
+                    }
+                }
+            }
+        }
+
+    }
+
     /**
      * @brief Prune all the leaves recursively
      *
@@ -90,7 +104,6 @@ public:
             while(bonds[start].size==1){//加在里面是四分之一的情况要做
                 ax=bonds[start][0];
                 fat=bonds.rollind(start, ax);
-//                settype(start, fat, ax, branch);
                 cumleaf[fat]+=1+cumleaf[start];
                 if(cumleaf[fat]>maxclus) maxclus=cumleaf[fat];
                 bonds[start].clear();
@@ -116,7 +129,6 @@ public:
             if(fatherax[a]!=marked){
                 son=a;
                 a=father[a];
-//                settype(a, son, fatherax[son], nonbrg);
                 tmp++;
                 fatherax[son]=marked;
             }
@@ -138,7 +150,6 @@ public:
      */
     void backtrace(uint a, uint b){
         static vector<uint> s;
-//        if(s.size()>64) s.resize(64);
         do{
             if(time[a]>=time[b]){
                 s.push_back(a);
@@ -199,7 +210,6 @@ public:
                             fatherax[near]=ax;
                         }
                         else{
-//                            settype(curr, near, ax, nonbrg);
                             tmp=1;
                             backtrace(near, curr);
                         }
