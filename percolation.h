@@ -3,6 +3,8 @@
 #include <cstdint>
 #include <cmath>
 #include <queue>
+#define NDEBUG
+#include <cassert>
 #include "16807.h"
 #include "ndarray.h"
 #include "zonebond.h"
@@ -21,30 +23,30 @@ template<uint D>
  * @brief The torus class for bond classification
  */
 class ctorus{
-    ndarray<uint8_t> cumleaf;     ///< Cumulated leafs in relay
-    ndarray<uint16_t> cumbfree;   ///< Cumulated non-bridges in relay
-    ndarray<int16_t> time;      ///< Time for BFS
-    ndarray<int> father;        ///< Father node for backtracing
+    ndarray<uint16_t> cumleaf;     ///< Cumulated leafs in relay
+    ndarray<uint32_t> cumbfree;   ///< Cumulated non-bridges in relay
+    ndarray<uint16_t> time;      ///< Time for BFS
+    ndarray<uint> father;        ///< Father node for backtracing
     ndarray<int8_t> fatherax;   ///< The axis from which the father come
     uint tmp;
 public:
-    int maxclus;                ///< The Biggest Cluster
-    int countclus;              ///< The Total Cluster
-    int maxlfree;               ///< The biggest leaf-free Cluster
-    int countlfree;             ///< The Total leaf-free Cluster
-    int maxbfree;               ///< The biggest bridge-free cluster
-    int countbfree;             ///< The Total bridge-free cluster
-    ndarray<nbond<D>> bonds;    ///< Rember the bonds by means of list
+    uint maxclus;                ///< The Biggest Cluster
+    uint countclus;              ///< The Total Cluster
+    uint maxlfree;               ///< The biggest leaf-free Cluster
+    uint countlfree;             ///< The Total leaf-free Cluster
+    uint maxbfree;               ///< The biggest bridge-free cluster
+    uint countbfree;             ///< The Total bridge-free cluster
+    ndarray<nbond<D>> bonds;     ///< Rember the bonds by means of list
 //    ndarray<uint8_t> type[D];   ///< Rember the type for each bond by matrix
-    ctorus(int width){
+    ctorus(uint width){
         bonds=ndarray<nbond<D>>(D, width);
 //        for(uint i=0;i<D;i++){
 //            type[i]=ndarray<int8_t>(D, width);
 //        }
-        cumleaf=ndarray<uint8_t>(bonds);
-        cumbfree=ndarray<uint16_t>(bonds);
-        time=ndarray<int16_t>(bonds);
-        father=ndarray<int>(bonds);
+        cumleaf=ndarray<uint16_t>(bonds);
+        cumbfree=ndarray<uint32_t>(bonds);
+        time=ndarray<uint16_t>(bonds);
+        father=ndarray<uint>(bonds);
         fatherax=ndarray<int8_t>(bonds);
     }
     /**
@@ -54,16 +56,16 @@ public:
      * Junction is the default value for a bond.
      */
     void setbond(double prob){
-        int near;
+        uint near;
 //        for(uint i=0;i<D;i++) type[i]=empty;
         maxclus=maxlfree=maxbfree=countclus=countlfree=countbfree=0;
         cumleaf=0;
         cumbfree=0;
         time=0;
-        for(int curr=0;curr<bonds.size();curr++){
+        for(uint curr=0;curr<bonds.size();curr++){
             bonds[curr].clear();
         }
-        for(int curr=0;curr<bonds.size();curr++){
+        for(uint curr=0;curr<bonds.size();curr++){
             for(uint ax=0; ax<D; ax++){
                 if(myrand()<prob){
                     near=bonds.rollindex(curr, ax);
@@ -81,9 +83,9 @@ public:
      * BTW: Get the maxbranch as the init value of maxclus.
      */
     void prune(){
-        int start, fat;
+        uint start, fat;
         int8_t ax;
-        for(int i=0;i<bonds.size();i++){
+        for(uint i=0;i<bonds.size();i++){
             start=i;
             while(bonds[start].size==1){//加在里面是四分之一的情况要做
                 ax=bonds[start][0];
@@ -108,8 +110,8 @@ public:
      *
      * For every diverging point, must stop!
      */
-    void descend(int &a){
-        int son=a;
+    void descend(uint &a){
+        uint son=a;
         do{
             if(fatherax[a]!=marked){
                 son=a;
@@ -134,9 +136,9 @@ public:
      * + The stack will reserve a fixed size to reduce the consumption
      * of reallocating memory
      */
-    void backtrace(int a, int b){
-        static vector<int> s;
-        if(s.size()>64) s.resize(64);
+    void backtrace(uint a, uint b){
+        static vector<uint> s;
+//        if(s.size()>64) s.resize(64);
         do{
             if(time[a]>=time[b]){
                 s.push_back(a);
@@ -156,6 +158,7 @@ public:
         for(uint i=0;i<s.size();i++){
             father[s[i]]=a;
             cumbfree[a]+=cumbfree[s[i]];
+            assert(cumbfree[a]<60000);
             cumbfree[s[i]]=0;
         }
         if(maxbfree<cumbfree[a]) maxbfree=cumbfree[a];
@@ -168,9 +171,11 @@ public:
      * + Will turn the undirected graph into directed
      */
     void dejunct(){
-        queue<int> q;
-        int curr, near, ax, currclus, currlfree;
-        for(int i=0;i<bonds.size();i++){
+        queue<uint> q;
+        uint curr, near;
+        int8_t ax;
+        uint currclus, currlfree;
+        for(uint i=0;i<bonds.size();i++){
             if ((time[i]==0) && bonds[i].size){
                 time[i]++;
                 fatherax[i]=0;
@@ -180,7 +185,7 @@ public:
                 while(!q.empty()){
                     curr=q.front();
                     currclus+=cumleaf[curr];
-                    for(int ii=0;ii<bonds[curr].size;ii++){
+                    for(uint ii=0;ii<bonds[curr].size;ii++){
                         currlfree++;
                         currclus++;
                         ax=bonds[curr][ii];
@@ -188,6 +193,7 @@ public:
                         bonds[near].finddelrev(ax);
                         if(time[near]==0){
                             time[near]=time[curr]+1;
+                            assert(time[near]<60000);
                             q.push(near);
                             father[near]=curr;
                             fatherax[near]=ax;
