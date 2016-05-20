@@ -24,11 +24,11 @@ template<uint D>
  * @brief The torus class for bond classification
  */
 class ctorus{
-    ndarray<uint16_t> cumleaf;     ///< Cumulated leafs in relay
-    ndarray<uint32_t> cumbfree;   ///< Cumulated non-bridges in relay
-    ndarray<uint16_t> time;      ///< Time for BFS
-    ndarray<uint> father;        ///< Father node for backtracing
-    ndarray<int8_t> fatherax;   ///< The axis from which the father come
+    ndarray<uint16_t, D> cumleaf;     ///< Cumulated leafs in relay
+    ndarray<uint32_t, D> cumbfree;   ///< Cumulated non-bridges in relay
+    ndarray<uint16_t, D> time;      ///< Time for BFS
+    ndarray<uint, D> father;        ///< Father node for backtracing
+    ndarray<int8_t, D> fatherax;   ///< The axis from which the father come
     uint tmp;
 public:
     uint maxclus;                ///< The Biggest Cluster
@@ -37,14 +37,14 @@ public:
     uint countlfree;             ///< The Total leaf-free Cluster
     uint maxbfree;               ///< The biggest bridge-free cluster
     uint countbfree;             ///< The Total bridge-free cluster
-    ndarray<nbond<D>> bonds;     ///< Rember the bonds by means of list
+    ndarray<nbond<D>, D> bonds;     ///< Rember the bonds by means of list
     ctorus(uint width){
-        bonds=ndarray<nbond<D>>(D, width);
-        cumleaf=ndarray<uint16_t>(bonds);
-        cumbfree=ndarray<uint32_t>(bonds);
-        time=ndarray<uint16_t>(bonds);
-        father=ndarray<uint>(bonds);
-        fatherax=ndarray<int8_t>(bonds);
+        bonds=ndarray<nbond<D>, D>(width);
+        cumleaf=ndarray<uint16_t, D>(bonds);
+        cumbfree=ndarray<uint32_t, D>(bonds);
+        time=ndarray<uint16_t, D>(bonds);
+        father=ndarray<uint, D>(bonds);
+        fatherax=ndarray<int8_t, D>(bonds);
     }
     /**
      * @brief set bonds and initialize the variables
@@ -79,7 +79,7 @@ public:
     void connect(){
         queue<uint> q;
         uint curr, near, ccol=0, count=0;
-        ndarray<uint> color(bonds);
+        ndarray<uint, D> color(bonds);
         color=0;    //zero is grey, unvisited
         for(uint i=0;i<bonds.size();i++){
             if((color[i]==0) && bonds[i].size){
@@ -265,9 +265,9 @@ template<int D>
 class wtorus{
     int sign(int x){return (x>=0)?1:-1;}
 public:
-    ndarray<nbond<D>> bonds;
+    ndarray<nbond<D>, D> bonds;
     wtorus(int width){
-        bonds=ndarray<nbond<D>>(D, width);
+        bonds=ndarray<nbond<D>, D>(D, width);
     }
     void setbond(double prob){
         int near;
@@ -300,8 +300,8 @@ public:
     }
     int wrapping(){
         queue<int> q;
-        ndarray<uint8_t> visit(bonds);
-        ndarray<zone<D>> z(bonds);
+        ndarray<uint8_t, D> visit(bonds);
+        ndarray<zone<D>, D> z(bonds);
         typename zone<D>::intD_t dz;
         int curr, near, count=0;
         int8_t delta, ax, absax;
