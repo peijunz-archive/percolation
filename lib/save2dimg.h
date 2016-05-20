@@ -41,14 +41,14 @@ void savemat(ndarray<uint8_t> b[2], string fname, uint8_t *col=geo){
     imwrite(fname ,M);
 }
 
-template<unsigned int L, bool undirected=true>
+template<unsigned int L=5, bool undirected=true>
 /**
  * @brief save 2D near linked list to image
  * @param fname
  *
  * Save 2D percolation to image using openCV
  */
-void savenlist(ndarray<nbond<2>> b, string fname){
+void savenlist(ndarray<nbond<2>> &b, string fname){
     int width=b.shape(0), ax, absax, sf=L/2, W=width*L, delta;
     Mat M;
     ndarray<uint8_t> g(2, W);
@@ -60,14 +60,14 @@ void savenlist(ndarray<nbond<2>> b, string fname){
                 ax=b(i,j)[k];
                 if(undirected){
                     if(ax<0) continue;
-                    for(int l=1;l<L;l++){
+                    for(uint l=1;l<L;l++){
                         g((L*i+l*(1-ax)+sf)%W,(L*j+l*ax+sf)%W)=63;
                     }
                 }
                 else{
                     if(ax>=0){absax=ax; delta=1;}
                     else{absax=ax+2; delta=-1;}
-                    for(int l=1;l<L;l++){
+                    for(uint l=1;l<L;l++){
                         g((L*i+l*(1-absax)*delta+sf)%W,\
                           (L*j+l*absax*delta+sf)%W)=63;
                     }

@@ -8,6 +8,7 @@
 #include "16807.h"
 #include "ndarray.h"
 #include "zonebond.h"
+#define COLOR
 /**
  * @file percolation.h
  * @author zpj
@@ -71,24 +72,49 @@ public:
             }
         }
     }
-    void densify(){
-        uint8_t tmp(bonds);
+    /**
+     * @brief Maximize connected components of the cluster without adding any site,
+     * should be changed to only connected ones
+     */
+    void connect(){
+        queue<uint> q;
+        uint curr, near, ccol=0, count=0;
+        ndarray<uint> color(bonds);
+        color=0;    //zero is grey, unvisited
         for(uint i=0;i<bonds.size();i++){
-            tmp[i]=bonds[i].size;
+            if((color[i]==0) && bonds[i].size){
+                color[i]=++ccol;
+                q.push(i);
+                while(!q.empty()){
+                    curr=q.front();
+                    for(uint ii=0;ii<bonds[curr].size;ii++){
+                        near=color.rollind(curr,bonds[curr][ii]);
+                        if(color[near]==0){
+                            color[near]=ccol;
+                            q.push(near);
+                        }
+                    }
+                    q.pop();
+                }
+            }
+        }
+        cout<<ccol<<'\t';
+        for(uint i=0;i<bonds.size();i++){
             bonds[i].clear();
         }
         for(uint curr=0;curr<bonds.size();curr++){
-            if(tmp[curr]){
+            if(color[curr]){
                 for(uint ax=0;ax<D;ax++){
                     near=bonds.rollindex(curr, ax);
-                    if(tmp[near]){
+                    if(color[near]==color[curr]){
+                        count++;
                         bonds[curr].append(ax);
                         bonds[near].append(ax-D);
                     }
                 }
             }
         }
-
+        cout<<count<<endl;
     }
 
     /**
@@ -176,10 +202,11 @@ public:
         s.clear();
     }
     /**
-     * @brief Identify junctions and then delete it
+     * @brief Identify junctions
      *
      * A semi-destructive process:
-     * + Will turn the undirected graph into directed
+     * + Will turn the undirected graph into directed? Necessary?
+     * + Use time to decide which to backtrace
      */
     void dejunct(){
         queue<uint> q;

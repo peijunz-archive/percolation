@@ -1,8 +1,9 @@
 #! /usr/bin/env python3
 import os
-from numpy import *
+from pylab import *
 from time import time
 prgpath="/home/zpj/code/build-percolation-Desktop-Release/percolation"
+DIM=3
 def gettime():
     return int(time()%86400)
 rtime=gettime()
@@ -19,22 +20,28 @@ def analyse(width):
     A=loadtxt(genfname(width), skiprows=4)
     m=mean(A, axis=0)
     s=std(A, axis=0)
-    m[:4]/=2*width**2
-    s[:4]/=2*width**2
     return [m, s]
 def analysel(w):
     L=array([analyse(wid) for wid in w])
     return L.transpose(2, 1, 0)
-def linearfit(x, y):
-    if(len(x)!=len(y)):
+def linearfit(x, y, name=""):
+    l=len(x)
+    if(l!=len(y)):
         return
     n=len(x)
-    xy=dot(x,y)
-    xx=dot(x,x)
-    yy=dot(y,y)
+    mx=mean(x)
+    my=mean(y)
+    xy=dot(x,y)-n*mx*my
+    xx=dot(x,x)-n*mx*mx
+    yy=dot(y,y)-n*my*my
     k=xy/xx
-    b=mean(y)-k*mean(x)
+    b=my-k*mx
     r=xy/sqrt(xx*yy)
+    plot(x, y, 'o')
+    plot(x, k*x+b, '-', label="D=%f"%(k))
+    legend(loc="upper left")
+    if(len(name)):
+        savefig(name+'.pdf')
     return k,b,r
 if __name__=="__main__":
     w=array([16,24,32,48,64,96,128])

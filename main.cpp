@@ -1,21 +1,31 @@
 #include <iostream>
 #include "percolation.h"
 using namespace std;
-int main(){
+int gendata(){
     int width=10;
     int times;
     double prob;
     setseed();
-    cout<<"D=3, Input\twidth\ttimes\tprob\n";
+    cout<<"D=2, Input\twidth\ttimes\tprob\n";
     cin>>width>>times>>prob;
     cout<<"Parameters:\t"<<width<<'\t'<<times<<'\t'<<prob<<endl;
-    ctorus<3> t(width);
+    ctorus<2> t(width);
     cout<<"键\t枝\t结\t环\t最大丛\t去枝丛\t去桥丛\n";
     for(int i=0;i<times;i++){
         t.setbond(prob);
         t.prune();
         t.dejunct();
         t.bondcount();
+    }
+    return 0;
+}
+
+int main(){
+    ctorus<2> t(120);
+    setseed();
+    for(uint i=0;i<10000;i++){
+        t.setbond(0.5);
+        t.connect();
     }
     return 0;
 }
