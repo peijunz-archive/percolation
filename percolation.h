@@ -8,7 +8,7 @@
 #include <cassert>
 #include "ndarray.h"
 #include "zonebond.h"
-mt19937 myrand(random_device{}());
+mt19937 myrand(random_device {}());
 #define COLOR
 /**
  * @file percolation.h
@@ -24,14 +24,14 @@ template<uint D>
 /**
  * @brief The torus class for bond classification
  */
-class ctorus{
+class ctorus {
     ndarray<uint16_t, D> cumleaf;     ///< Cumulated leafs in relay
     ndarray<uint32_t, D> cumbfree;   ///< Cumulated non-bridges in relay
     ndarray<uint16_t, D> time;      ///< Time for BFS
     ndarray<uint, D> father;        ///< Father node for backtracing
     ndarray<int8_t, D> fatherax;   ///< The axis from which the father come
     uint tmp;
-public:
+  public:
     uint maxclus;                ///< The Biggest Cluster
     uint countclus;              ///< The Total Cluster
     uint maxlfree;               ///< The biggest leaf-free Cluster
@@ -39,13 +39,13 @@ public:
     uint maxbfree;               ///< The biggest bridge-free cluster
     uint countbfree;             ///< The Total bridge-free cluster
     ndarray<nbond<D>, D> bonds;     ///< Rember the bonds by means of list
-    ctorus(uint width){
-        bonds=ndarray<nbond<D>, D>(width);
-        cumleaf=ndarray<uint16_t, D>(bonds);
-        cumbfree=ndarray<uint32_t, D>(bonds);
-        time=ndarray<uint16_t, D>(bonds);
-        father=ndarray<uint, D>(bonds);
-        fatherax=ndarray<int8_t, D>(bonds);
+    ctorus(uint width) {
+        bonds = ndarray<nbond<D>, D>(width);
+        cumleaf = ndarray<uint16_t, D>(bonds);
+        cumbfree = ndarray<uint32_t, D>(bonds);
+        time = ndarray<uint16_t, D>(bonds);
+        father = ndarray<uint, D>(bonds);
+        fatherax = ndarray<int8_t, D>(bonds);
     }
     /**
      * @brief set bonds and initialize the variables
@@ -53,22 +53,22 @@ public:
      *
      * Junction is the default value for a bond.
      */
-    void setbond(double prob){
+    void setbond(double prob) {
         uint near;
-        maxclus=maxlfree=maxbfree=countclus=countlfree=countbfree=0;
-        cumleaf=0;
-        cumbfree=0;
-        time=0;
-        for(uint curr=0;curr<bonds.size();curr++){
+        maxclus = maxlfree = maxbfree = countclus = countlfree = countbfree = 0;
+        cumleaf = 0;
+        cumbfree = 0;
+        time = 0;
+        for(uint curr = 0; curr < bonds.size(); curr++) {
             bonds[curr].clear();
         }
-        for(uint curr=0;curr<bonds.size();curr++){
-            for(uint ax=0; ax<D; ax++){
-                if(myrand()<prob*myrand.max()){
-                    near=bonds.rollindex(curr, ax);
+        for(uint curr = 0; curr < bonds.size(); curr++) {
+            for(uint ax = 0; ax < D; ax++) {
+                if(myrand() < prob * myrand.max()) {
+                    near = bonds.rollindex(curr, ax);
                     countclus++;
                     bonds[curr].append(ax);
-                    bonds[near].append(ax-D);
+                    bonds[near].append(ax - D);
                 }
             }
         }
@@ -77,21 +77,21 @@ public:
      * @brief Maximize connected components of the cluster without adding any site,
      * should be changed to only connected ones
      */
-    void connect(){
+    void connect() {
         queue<uint> q;
-        uint curr, near, ccol=0, count=0;
+        uint curr, near, ccol = 0;
         ndarray<uint, D> color(bonds);
-        color=0;    //zero is grey, unvisited
-        for(uint i=0;i<bonds.size();i++){
-            if((color[i]==0) && bonds[i].size){
-                color[i]=++ccol;
+        color = 0;  //zero is grey, unvisited
+        for(uint i = 0; i < bonds.size(); i++) {
+            if((color[i] == 0) && bonds[i].size) {
+                color[i] = ++ccol;
                 q.push(i);
-                while(!q.empty()){
-                    curr=q.front();
-                    for(uint ii=0;ii<bonds[curr].size;ii++){
-                        near=color.rollind(curr,bonds[curr][ii]);
-                        if(color[near]==0){
-                            color[near]=ccol;
+                while(!q.empty()) {
+                    curr = q.front();
+                    for(uint ii = 0; ii < bonds[curr].size; ii++) {
+                        near = color.rollind(curr, bonds[curr][ii]);
+                        if(color[near] == 0) {
+                            color[near] = ccol;
                             q.push(near);
                         }
                     }
@@ -99,23 +99,21 @@ public:
                 }
             }
         }
-        cout<<ccol<<'\t';
-        for(uint i=0;i<bonds.size();i++){
+        cout << ccol << '\t';
+        for(uint i = 0; i < bonds.size(); i++) {
             bonds[i].clear();
         }
-        for(uint curr=0;curr<bonds.size();curr++){
-            if(color[curr]){
-                for(uint ax=0;ax<D;ax++){
-                    near=bonds.rollindex(curr, ax);
-                    if(color[near]==color[curr]){
-                        count++;
+        for(uint curr = 0; curr < bonds.size(); curr++) {
+            if(color[curr]) {
+                for(uint ax = 0; ax < D; ax++) {
+                    near = bonds.rollindex(curr, ax);
+                    if(color[near] == color[curr]) {
                         bonds[curr].append(ax);
-                        bonds[near].append(ax-D);
+                        bonds[near].append(ax - D);
                     }
                 }
             }
         }
-        cout<<count<<endl;
     }
 
     /**
@@ -123,19 +121,19 @@ public:
      *
      * BTW: Get the maxbranch as the init value of maxclus.
      */
-    void prune(){
+    void prune() {
         uint start, fat;
         int8_t ax;
-        for(uint i=0;i<bonds.size();i++){
-            start=i;
-            while(bonds[start].size==1){//加在里面是四分之一的情况要做
-                ax=bonds[start][0];
-                fat=bonds.rollind(start, ax);
-                cumleaf[fat]+=1+cumleaf[start];
-                if(cumleaf[fat]>maxclus) maxclus=cumleaf[fat];
+        for(uint i = 0; i < bonds.size(); i++) {
+            start = i;
+            while(bonds[start].size == 1) { //加在里面是四分之一的情况要做
+                ax = bonds[start][0];
+                fat = bonds.rollind(start, ax);
+                cumleaf[fat] += 1 + cumleaf[start];
+                if(cumleaf[fat] > maxclus) maxclus = cumleaf[fat];
                 bonds[start].clear();
                 bonds[fat].finddelrev(ax);
-                start=fat;
+                start = fat;
             }
         }
     }
@@ -150,19 +148,18 @@ public:
      *
      * For every diverging point, must stop!
      */
-    void descend(uint &a){
-        uint son=a;
-        do{
-            if(fatherax[a]!=marked){
-                son=a;
-                a=father[a];
+    void descend(uint &a) {
+        uint son = a;
+        do {
+            if(fatherax[a] != marked) {
+                son = a;
+                a = father[a];
                 tmp++;
-                fatherax[son]=marked;
+                fatherax[son] = marked;
+            } else {
+                a = father[a];
             }
-            else{
-                a=father[a];
-            }
-        }while(bonds[a].size==1);
+        } while(bonds[a].size == 1);
     }
     /**
      * @brief backtrace to the highest root for both a and b
@@ -175,31 +172,30 @@ public:
      * + The stack will reserve a fixed size to reduce the consumption
      * of reallocating memory
      */
-    void backtrace(uint a, uint b){
+    void backtrace(uint a, uint b) {
         static vector<uint> s;
-        do{
-            if(time[a]>=time[b]){
+        do {
+            if(time[a] >= time[b]) {
                 s.push_back(a);
                 descend(a);
-            }
-            else{
+            } else {
                 s.push_back(b);
                 descend(b);
             }
-        }while(a!=b);
-        while(fatherax[a]==marked){
+        } while(a != b);
+        while(fatherax[a] == marked) {
             s.push_back(a);
-            a=father[a];
+            a = father[a];
         }
-        countbfree+=tmp;
-        cumbfree[a]+=tmp;
-        for(uint i=0;i<s.size();i++){
-            father[s[i]]=a;
-            cumbfree[a]+=cumbfree[s[i]];
-            assert(cumbfree[a]<60000);
-            cumbfree[s[i]]=0;
+        countbfree += tmp;
+        cumbfree[a] += tmp;
+        for(uint i = 0; i < s.size(); i++) {
+            father[s[i]] = a;
+            cumbfree[a] += cumbfree[s[i]];
+            assert(cumbfree[a] < 60000);
+            cumbfree[s[i]] = 0;
         }
-        if(maxbfree<cumbfree[a]) maxbfree=cumbfree[a];
+        if(maxbfree < cumbfree[a]) maxbfree = cumbfree[a];
         s.clear();
     }
     /**
@@ -209,52 +205,51 @@ public:
      * + Will turn the undirected graph into directed? Necessary?
      * + Use time to decide which to backtrace
      */
-    void dejunct(){
+    void dejunct() {
         queue<uint> q;
         uint curr, near;
         int8_t ax;
         uint currclus, currlfree;
-        for(uint i=0;i<bonds.size();i++){
-            if ((time[i]==0) && bonds[i].size){
+        for(uint i = 0; i < bonds.size(); i++) {
+            if((time[i] == 0) && bonds[i].size) {
                 time[i]++;
-                fatherax[i]=0;
-                currclus=0;
-                currlfree=0;
+                fatherax[i] = 0;
+                currclus = 0;
+                currlfree = 0;
                 q.push(i);
-                while(!q.empty()){
-                    curr=q.front();
-                    currclus+=cumleaf[curr];
-                    for(uint ii=0;ii<bonds[curr].size;ii++){
+                while(!q.empty()) {
+                    curr = q.front();
+                    currclus += cumleaf[curr];
+                    for(uint ii = 0; ii < bonds[curr].size; ii++) {
                         currlfree++;
                         currclus++;
-                        ax=bonds[curr][ii];
-                        near=bonds.rollind(curr,ax);
+                        ax = bonds[curr][ii];
+                        near = bonds.rollind(curr, ax);
                         bonds[near].finddelrev(ax);
-                        if(time[near]==0){
-                            time[near]=time[curr]+1;
-                            assert(time[near]<60000);
+                        if(time[near] == 0) {
+                            time[near] = time[curr] + 1;
+                            assert(time[near] < 60000);
                             q.push(near);
-                            father[near]=curr;
-                            fatherax[near]=ax;
-                        }
-                        else{
-                            tmp=1;
+                            father[near] = curr;
+                            fatherax[near] = ax;
+                        } else {
+                            tmp = 1;
                             backtrace(near, curr);
                         }
                     }
                     q.pop();
                 }
-                if(maxlfree<currlfree) maxlfree=currlfree;
-                if(maxclus<currclus) maxclus=currclus;
-                countlfree+=currlfree;
+                if(maxlfree < currlfree) maxlfree = currlfree;
+                if(maxclus < currclus) maxclus = currclus;
+                countlfree += currlfree;
             }
         }
     }
     /// Get the number for each bond type
-    void bondcount(){
-        cout<<countclus<<'\t'<<countclus-countlfree<<'\t';
-        cout<<countlfree-countbfree<<'\t'<<countbfree<<'\t';
-        cout<<maxclus<<'\t'<<maxlfree<<'\t'<<maxbfree<<endl;
+    void bondcount() {
+        cout << countclus << '\t' << countclus - countlfree << '\t';
+        cout << countlfree - countbfree << '\t' << countbfree << '\t';
+        cout << maxclus << '\t' << maxlfree << '\t' << maxbfree << endl;
     }
 };
 
@@ -263,84 +258,90 @@ template<int D>
  * @brief wrapping torus
  * + Use `zone` to save zone information to judge wrapping
  */
-class wtorus{
-    int sign(int x){return (x>=0)?1:-1;}
-public:
-    ndarray<nbond<D>, D> bonds;
-    wtorus(int width){
-        bonds=ndarray<nbond<D>, D>(D, width);
+class wtorus {
+    int sign(int x) {
+        return (x >= 0) ? 1 : -1;
     }
-    void setbond(double prob){
+  public:
+    ndarray<nbond<D>, D> bonds;
+    wtorus(int width) {
+        bonds = ndarray<nbond<D>, D>(D, width);
+    }
+    void setbond(double prob) {
         int near;
-        for(int curr=0;curr<bonds.size();curr++){
+        for(int curr = 0; curr < bonds.size(); curr++) {
             bonds[curr].clear();
         }
-        for(int curr=0;curr<bonds.size();curr++){
-            for(int ax=0; ax<D; ax++){
-                if(myrand()<prob*myrand.max()){
-                    near=bonds.rollindex(curr, ax);
+        for(int curr = 0; curr < bonds.size(); curr++) {
+            for(int ax = 0; ax < D; ax++) {
+                if(myrand() < prob * myrand.max()) {
+                    near = bonds.rollindex(curr, ax);
                     bonds[curr].append(ax);
-                    bonds[near].append(ax-D);
+                    bonds[near].append(ax - D);
                 }
             }
         }
     }
-    void prune(){
+    void prune() {
         int fat, leaf;
         int8_t ax;
-        for(int i=0;i<bonds.size();i++){
-            leaf=i;
-            while(bonds[leaf].size==1){
-                ax=bonds[leaf][0];
-                fat=bonds.rollind(leaf, ax);
+        for(int i = 0; i < bonds.size(); i++) {
+            leaf = i;
+            while(bonds[leaf].size == 1) {
+                ax = bonds[leaf][0];
+                fat = bonds.rollind(leaf, ax);
                 bonds[leaf].clear();
                 bonds[fat].finddelrev(ax);
-                leaf=fat;
+                leaf = fat;
             }
         }
     }
-    int wrapping(){
+    int wrapping() {
         queue<int> q;
         ndarray<uint8_t, D> visit(bonds);
         ndarray<zone<D>, D> z(bonds);
         typename zone<D>::intD_t dz;
-        int curr, near, count=0;
+        int curr, near, count = 0;
         int8_t delta, ax, absax;
 #ifndef WRAPONCE
-            prune();
+        prune();
 #endif
-        visit=0;   // 0 for unvisited
-        for(int i=0;i<bonds.size();i++){
-            if (!visit[i] && bonds[i].size){
-                z[i]=0;
-                visit[i]=1;
+        visit = 0; // 0 for unvisited
+        for(int i = 0; i < bonds.size(); i++) {
+            if(!visit[i] && bonds[i].size) {
+                z[i] = 0;
+                visit[i] = 1;
                 q.push(i);
-                while(!q.empty()){
-                    curr=q.front();
-                    for(int ii=0;ii<bonds[curr].size;ii++){
-                        ax=bonds[curr][ii];
-                        if(ax>=0){delta=1;absax=ax;}
-                        else{delta=-1;absax=ax+D;}
-                        near=bonds.rollindex(curr,absax,delta);
-                        if(delta==sign(near-curr)) delta=0;
-                        bonds[near].finddelrev(ax);
-                        if(!visit[near]){
-                            z[near]=z[curr];
-                            z[near][absax]+=delta;
-                            visit[near]=1;
-                            q.push(near);
+                while(!q.empty()) {
+                    curr = q.front();
+                    for(int ii = 0; ii < bonds[curr].size; ii++) {
+                        ax = bonds[curr][ii];
+                        if(ax >= 0) {
+                            delta = 1;
+                            absax = ax;
+                        } else {
+                            delta = -1;
+                            absax = ax + D;
                         }
-                        else{
-                            z[curr][absax]+=delta;
-                            dz=z[near]-z[curr];
-                            if(dz!=0){
+                        near = bonds.rollindex(curr, absax, delta);
+                        if(delta == sign(near - curr)) delta = 0;
+                        bonds[near].finddelrev(ax);
+                        if(!visit[near]) {
+                            z[near] = z[curr];
+                            z[near][absax] += delta;
+                            visit[near] = 1;
+                            q.push(near);
+                        } else {
+                            z[curr][absax] += delta;
+                            dz = z[near] - z[curr];
+                            if(dz != 0) {
 #ifdef WRAPONCE
-                                    return 1;
+                                return 1;
 #else
-                                    count++;
+                                count++;
 #endif
                             }
-                            z[curr][absax]-=delta;
+                            z[curr][absax] -= delta;
                         }
                     }
                     q.pop();
@@ -358,13 +359,13 @@ template<int D>
  * @param n     time of iteration
  * @return wrapping probability
  */
-double wrapprob(wtorus<D> &t, double p, int n=100){
-    double count=0;
-    for(int i=0;i<n;i++){
+double wrapprob(wtorus<D> &t, double p, int n = 100) {
+    double count = 0;
+    for(int i = 0; i < n; i++) {
         t.setbond(p);
-        count+=t.wrapping();
+        count += t.wrapping();
     }
-    return count/n;
+    return count / n;
 }
 template<int D>
 /**
@@ -374,15 +375,15 @@ template<int D>
  * @param y0    the given wrapping prob
  * @return bond setting
  */
-double bisecp(wtorus<D> &t, int n, double y0=0.5){
-    double xl=0, xr=1, xc=0, err=1/sqrt(n);
-    double yc=0;
-    while(fabs(yc-y0)>err){
-        xc=(xl+xr)/2;
-        yc=wrapprob(t, xc, n);
-        if(yc>y0) xr=xc;
-        else xl=xc;
-        cout<<"x="<<xc<<"\tdy="<<yc-y0<<endl;
+double bisecp(wtorus<D> &t, int n, double y0 = 0.5) {
+    double xl = 0, xr = 1, xc = 0, err = 1 / sqrt(n);
+    double yc = 0;
+    while(fabs(yc - y0) > err) {
+        xc = (xl + xr) / 2;
+        yc = wrapprob(t, xc, n);
+        if(yc > y0) xr = xc;
+        else xl = xc;
+        cout << "x=" << xc << "\tdy=" << yc - y0 << endl;
     }
     return xc;
 }
