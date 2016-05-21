@@ -9,7 +9,7 @@ int gendata() {
     cin >> width >> times >> prob;
     cout << "Parameters:\t" << width << '\t' << times << '\t' << prob << endl;
     ctorus<2> t(width);
-    cout << "键\t枝\t结\t环\t最大丛\t去枝丛\t去桥丛\n";
+    cout << "键\t枝\t结\t环\t最大丛\t去枝丛\t去桥丛\t最大枝\n";
     for(int i = 0; i < times; i++) {
         t.setbond(prob);
         t.prune();

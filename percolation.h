@@ -32,6 +32,7 @@ class ctorus {
     ndarray<int8_t, D> fatherax;   ///< The axis from which the father come
     uint tmp;
   public:
+    uint maxleaf;                ///< The Biggest Branch
     uint maxclus;                ///< The Biggest Cluster
     uint countclus;              ///< The Total Cluster
     uint maxlfree;               ///< The biggest leaf-free Cluster
@@ -55,7 +56,8 @@ class ctorus {
      */
     void setbond(double prob) {
         uint near;
-        maxclus = maxlfree = maxbfree = countclus = countlfree = countbfree = 0;
+        maxleaf = maxclus = maxlfree = maxbfree = 0;
+        countclus = countlfree = countbfree = 0;
         cumleaf = 0;
         cumbfree = 0;
         time = 0;
@@ -130,12 +132,13 @@ class ctorus {
                 ax = bonds[start][0];
                 fat = bonds.rollind(start, ax);
                 cumleaf[fat] += 1 + cumleaf[start];
-                if(cumleaf[fat] > maxclus) maxclus = cumleaf[fat];
+                if(cumleaf[fat] > maxleaf) maxleaf = cumleaf[fat];
                 bonds[start].clear();
                 bonds[fat].finddelrev(ax);
                 start = fat;
             }
         }
+        maxclus = maxleaf;
     }
     /**
      * @brief Decend to a lower level closer to root
@@ -249,7 +252,7 @@ class ctorus {
     void bondcount() {
         cout << countclus << '\t' << countclus - countlfree << '\t';
         cout << countlfree - countbfree << '\t' << countbfree << '\t';
-        cout << maxclus << '\t' << maxlfree << '\t' << maxbfree << endl;
+        cout << maxclus << '\t' << maxlfree << '\t' << maxbfree << maxleaf << endl;
     }
 };
 
