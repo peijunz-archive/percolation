@@ -2,12 +2,13 @@
 #include <vector>
 #include <cstdint>
 #include <cmath>
+#include <random>
 #include <queue>
 #define NDEBUG
 #include <cassert>
-#include "16807.h"
 #include "ndarray.h"
 #include "zonebond.h"
+mt19937 myrand(random_device{}());
 #define COLOR
 /**
  * @file percolation.h
@@ -63,7 +64,7 @@ public:
         }
         for(uint curr=0;curr<bonds.size();curr++){
             for(uint ax=0; ax<D; ax++){
-                if(myrand()<prob){
+                if(myrand()<prob*myrand.max()){
                     near=bonds.rollindex(curr, ax);
                     countclus++;
                     bonds[curr].append(ax);
@@ -276,7 +277,7 @@ public:
         }
         for(int curr=0;curr<bonds.size();curr++){
             for(int ax=0; ax<D; ax++){
-                if(myrand()<prob){
+                if(myrand()<prob*myrand.max()){
                     near=bonds.rollindex(curr, ax);
                     bonds[curr].append(ax);
                     bonds[near].append(ax-D);

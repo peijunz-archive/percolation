@@ -5,7 +5,6 @@ int gendata(){
     int width=10;
     int times;
     double prob;
-    setseed();
     cout<<"D=2, Input\twidth\ttimes\tprob\n";
     cin>>width>>times>>prob;
     cout<<"Parameters:\t"<<width<<'\t'<<times<<'\t'<<prob<<endl;
@@ -21,11 +20,6 @@ int gendata(){
 }
 
 int main(){
-    ctorus<2> t(120);
-    setseed();
-    for(uint i=0;i<10000;i++){
-        t.setbond(0.5);
-        t.connect();
-    }
+    gendata();
     return 0;
 }
