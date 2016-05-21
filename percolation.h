@@ -1,4 +1,4 @@
-#include <iostream>
+#include <cstdio>
 #include <vector>
 #include <cstdint>
 #include <cmath>
@@ -101,7 +101,6 @@ class ctorus {
                 }
             }
         }
-        cout << ccol << '\t';
         for(uint i = 0; i < bonds.size(); i++) {
             bonds[i].clear();
         }
@@ -250,9 +249,8 @@ class ctorus {
     }
     /// Get the number for each bond type
     void bondcount() {
-        cout << countclus << '\t' << countclus - countlfree << '\t';
-        cout << countlfree - countbfree << '\t' << countbfree << '\t';
-        cout << maxclus << '\t' << maxlfree << '\t' << maxbfree << maxleaf << endl;
+        printf("%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t\n", countclus, countclus - countlfree,
+               countlfree - countbfree, countbfree, maxclus, maxlfree, maxbfree, maxleaf);
     }
 };
 
@@ -386,7 +384,7 @@ double bisecp(wtorus<D> &t, int n, double y0 = 0.5) {
         yc = wrapprob(t, xc, n);
         if(yc > y0) xr = xc;
         else xl = xc;
-        cout << "x=" << xc << "\tdy=" << yc - y0 << endl;
+        printf("x=%f\tdy=%f\n", xc, yc - y0);
     }
     return xc;
 }

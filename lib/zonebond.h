@@ -1,6 +1,5 @@
 #ifndef ZONEBOND_H
 #define ZONEBOND_H
-#include <iostream>
 #include <cstdint>
 
 enum bondtype : uint8_t {
@@ -72,12 +71,6 @@ public:
             tmp[i] = c[i] - rhs[i];
         }
         return tmp.a;
-    }
-    void print() {
-        for(int i = 0; i < D; i++) {
-            cout << c[i] << "\t";
-        }
-        cout << endl;
     }
 };
 
