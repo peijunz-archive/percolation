@@ -48,11 +48,11 @@ template <uint D>
  * @param prob
  *
  * 不断的重复统计对应的物理量。
- * 每个计算机每天有计算量q0=f*t=2.5GHz*86400=2.16e5 G
+ * 每个计算机每天有计算量q0=f*t=1.8GHz*86400=1.55e5 G
  * 100个两天有计算量q=200*q0=4.32e7 G
  * Speed:
  * +3D, p=0.24881182, v=2.5GHz, t=26s, n=10 => 6.5G计算量每次
- * 故每台机器可以重复3e4次，总共重复6e6次
+ * 故每台机器可以重复2e4次，总共重复6e6次
  */
 void gendata(int width, int times, double prob) {
     means leaf, junc, circ, maxclus, maxlfree, maxbfree, maxleaf;

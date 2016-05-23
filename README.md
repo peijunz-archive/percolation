@@ -1,4 +1,8 @@
 # 逾渗模型
+## Deployment in server
++ `tar -xJvf latest.tar.xz`解压
++ `sed -i -e 's/nullptr/0/g' *` nullptr
+
 ## 算力
 + 每个电脑每天算力为`2.5GHz*86400s=2.16e5G`
 + 三维p=0.2488当最大宽度为256的时候大概消耗算力6.5G每次

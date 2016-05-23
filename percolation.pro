@@ -4,14 +4,13 @@ CONFIG -= app_bundle
 CONFIG -= qt
 
 QMAKE_CXXFLAGS += -std=c++0x -O3
-INCLUDEPATH += ./lib
 INCLUDEPATH += /usr/include/opencv
 
 LIBS += -L/usr/lib64 -lopencv_core -lopencv_imgcodecs -lopencv_highgui
 SOURCES += main.cpp \
 
 HEADERS += \
-    lib/ndarray.h \
-    lib/zonebond.h \
-    lib/save2dimg.h\
+    ndarray.h \
+    zonebond.h \
+    save2dimg.h\
     percolation.h

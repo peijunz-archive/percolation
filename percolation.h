@@ -8,7 +8,8 @@
 #include <cassert>
 #include "ndarray.h"
 #include "zonebond.h"
-mt19937 myrand(random_device {}());
+random_device tmp;
+mt19937 myrand(tmp());
 #define COLOR
 /**
  * @file percolation.h
