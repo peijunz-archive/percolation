@@ -1,2 +1,6 @@
 #!/usr/bin/env bash
-./percolation
+#PBS -l walltime=10:00:00:00
+date
+/exports/home/huangwei/zpj/percolation
+date
+
