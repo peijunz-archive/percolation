@@ -128,7 +128,7 @@ class ctorus {
         int8_t ax;
         for(uint i = 0; i < bonds.size(); i++) {
             start = i;
-            while(bonds[start].size == 1) { //加在里面是四分之一的情况要做
+            while(bonds[start].size == 1) {
                 ax = bonds[start][0];
                 fat = bonds.rollind(start, ax);
                 cumleaf[fat] += 1 + cumleaf[start];
