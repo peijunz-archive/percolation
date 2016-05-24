@@ -1,7 +1,7 @@
 # 逾渗模型
 ## 过程
 + `tar -xJvf latest.tar.xz`解压
-+ 在ndarray里面`#define nullptr 0`且删除#define MODERN
++ 在ndarray里面`define nullptr 0`且删除`define MODERN`
 
 ### 算力
 + 每个电脑每天算力为`2.5GHz*86400s=2.16e5G`
