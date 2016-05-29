@@ -3,7 +3,7 @@ CONFIG += console
 CONFIG -= app_bundle
 CONFIG -= qt
 
-QMAKE_CXXFLAGS += -std=c++0x -O3
+QMAKE_CXXFLAGS += -std=c++11 -O3
 INCLUDEPATH += /usr/include/opencv
 
 LIBS += -L/usr/lib64 -lopencv_core -lopencv_imgcodecs -lopencv_highgui

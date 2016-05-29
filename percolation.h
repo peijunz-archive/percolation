@@ -18,7 +18,7 @@ mt19937 myrand(tmp());
  * @todo Remember bond type without using other method like backtracing tree?
  * Obsolete the bondtype matrix
  */
-
+uint nbacktrace=0, ndescend=0;
 using namespace std;
 
 template<uint D>
@@ -160,6 +160,7 @@ class ctorus {
                 tmp++;
                 fatherax[son] = marked;
             } else {
+                ndescend++;
                 a = father[a];
             }
         } while(bonds[a].size == 1);
@@ -198,6 +199,7 @@ class ctorus {
             assert(cumbfree[a] < 60000);
             cumbfree[s[i]] = 0;
         }
+        nbacktrace++;
         if(maxbfree < cumbfree[a]) maxbfree = cumbfree[a];
         s.clear();
     }
@@ -253,6 +255,10 @@ class ctorus {
         printf("%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t\n", countclus, countclus - countlfree,
                countlfree - countbfree, countbfree, maxclus, maxlfree, maxbfree, maxleaf);
     }
+    template<unsigned int L>
+    friend void savemat(ctorus<2> &t, string fname, uint8_t *col);
+    template<unsigned int L, bool undirected>
+    friend void savenlist(ctorus<2> &t, string fname);
 };
 
 template<int D>
