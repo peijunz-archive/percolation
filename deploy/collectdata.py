@@ -133,6 +133,8 @@ data=np.load("data.npy")
 #data=collectdata()
 val, err=data
 D=-1.8596#47275
+Dh=2.52237
+Dl=1.87246
 x=L**D
 S=np.sum(val[0:3], axis=0)
 data[:, :3]/=S
@@ -149,26 +151,53 @@ def cexp(p, y, x):
     return k*np.log(x+d)+b-y
 def drawdensity():
     k,b,r,f=linearfit(L**D, val[1])
-    plt.plot(x, f(x), 'k-', x, val[1], 'ro')
-    plt.xlabel(r"$L^{%f}$"%D)
+    print(b)
+    plt.plot(x, f(x), 'k-')
+    plt.errorbar(x, val[1], err[1], fmt='o')
+    plt.xlabel(r"$L^{%.4f}$"%D)
     plt.ylabel(r"$\rho_j$")
     plt.grid()
     plt.savefig("junction.pdf")
     plt.cla()
+    
     k,b,r,f=linearfit(L**D, val[2])
-    plt.plot(x, f(x), 'k-', x, val[2], 'bo')
-    plt.xlabel(r"$L^{%f}$"%D)
+    print(b)
+    plt.plot(x, f(x), 'k-')
+    plt.errorbar(x, val[2], err[2], fmt='bo')
+    plt.xlabel(r"$L^{%.4f}$"%D)
     plt.ylabel(r"$\rho_b$")
     plt.grid()
     plt.savefig("nonbridge.pdf")
     plt.cla()
-    plt.plot(x, (val[0]-0.796)/1e-4, 'ro')
-    plt.xlabel(r"$L^{%f}$"%D)
+    
+    plt.errorbar(x, (val[0]-0.796)/1e-4, err[0]/1e-4, fmt='ro')
+    plt.xlabel(r"$L^{%.4f}$"%D)
     plt.ylabel(r"$(\rho_l-0.796)/10^{-4}$")
     plt.ylim([-1, 1])
     plt.grid()
     plt.savefig("leaf.pdf")
     plt.cla()
+def drawmax():
+    tmp=val[4]*L**(-Dh)
+    k,b,r,f=linearfit(x, tmp)
+    print(b)
+    plt.plot(x, f(x), 'k-', x, tmp, 'bo')
+    plt.xlabel(r"$L^{%.4f}$"%D)
+    plt.ylabel(r"$L^{%.5f}C_{lf}$"%Dh)
+    plt.grid()
+    plt.savefig("maxl.pdf")
+    plt.cla()
+
+    tmp=val[4]*L**(-Dh)
+    k,b,r,f=linearfit(x, tmp)
+    print(b)
+    plt.plot(x, f(x), 'k-', x, tmp, 'bo')
+    plt.xlabel(r"$L^{%.4f}$"%D)
+    plt.ylabel(r"$L^{%.5f}C_{bf}$"%Dl)
+    plt.grid()
+    plt.savefig("maxb.pdf")
+    plt.cla()
+    
 def fitdensity():
     p=np.array([ 0.05678149, -0.98247447,  -1.85891885])
     print("枢纽比例", leastsq(cpower, p, args=(val[1], L)))
@@ -184,9 +213,23 @@ def fitclus():
 def fitleaf():
     p=np.array([  73.40869749, -150.01109385,    5.29100011])
     print("最大叶", leastsq(cexp, p , args=(val[-1], L)))
+def drawleaf():
+    x=np.log(L+5.291)
+    a=val[-1]
+    k,b,r,f=linearfit(x, a)
+    print(k, b, r)
+    plt.plot(x, f(x), 'k-', x, a, 'o')
+    plt.xlabel(r"$\ln(L+5.291)$")
+    plt.ylabel(r"$C_{l}$")
+    plt.grid()
+    plt.savefig("maxleaf.pdf")
+    plt.cla()
 
 if __name__=="__main__":
-    fitleaf()
-    fitdensity()
-    fitclus()
+    #fitleaf()
+    #fitdensity()
+    #fitclus()
+    drawmax()
+    drawmax()
+    
     
