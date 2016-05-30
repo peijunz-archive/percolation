@@ -94,18 +94,16 @@ void savesample(int width, double prob){
 }
 
 int main() {
-    vector<double> probl={0.1, 0.15, 0.2, 0.22, 0.235, 0.24881182,
-        0.25, 0.26, 0.28, 0.33, 0.4, 0.55, 0.7, 0.9, 0.99};
-//    savesample<true>(24, 0.48);
-//    vector<int> L={32, 45, 64, 92};
-//    int nmin=10;//10000/Day, 7/min, 420/h;
-//    for(uint i =0; i<L.size();i++){
-//        gendata<2>(L[i], L[L.size()-1]*nmin/L[i], 0.24881182);
-//    }
-    for(uint i=0;i<probl.size();i++){
-        gendata<3>(128, 20, probl[i]);
-        printf("链接/回溯\t%f\n", (double)ndescend/nbacktrace);
-        ndescend=nbacktrace=0;
+    savesample<true>(24, 0.48);
+//    vector<double> probl={0.1, 0.15, 0.2, 0.22, 0.235, 0.24881182,
+//        0.26, 0.28, 0.33, 0.4, 0.55, 0.7, 0.9, 0.99};
+    vector<int> L={32, 45, 64, 92};
+    int nmin=10;//10000/Day, 7/min, 420/h;
+    for(uint i =0; i<L.size();i++){
+        gendata<2>(L[i], L[L.size()-1]*nmin/L[i], 0.24881182);
     }
+//    for(uint i=0;i<probl.size();i++){
+//        gendata<3>(128, 40, probl[i]);
+//    }
     return 0;
 }

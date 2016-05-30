@@ -8,9 +8,9 @@
 #include <cassert>
 #include "ndarray.h"
 #include "zonebond.h"
+//#define COUNTLINK
 random_device tmp;
 mt19937 myrand(tmp());
-#define COLOR
 /**
  * @file percolation.h
  * @author zpj
@@ -18,9 +18,10 @@ mt19937 myrand(tmp());
  * @todo Remember bond type without using other method like backtracing tree?
  * Obsolete the bondtype matrix
  */
-uint nbacktrace=0, ndescend=0;
 using namespace std;
-
+#ifdef COUNTLINK
+uint nbacktrace=0, ndescend=0, nmarked=0;
+#endif
 template<uint D>
 /**
  * @brief The torus class for bond classification
@@ -62,6 +63,9 @@ class ctorus {
         cumleaf = 0;
         cumbfree = 0;
         time = 0;
+#ifdef COUNTLINK
+        nbacktrace=0, ndescend=0, nmarked=0;
+#endif
         for(uint curr = 0; curr < bonds.size(); curr++) {
             bonds[curr].clear();
         }
@@ -159,8 +163,10 @@ class ctorus {
                 a = father[a];
                 tmp++;
                 fatherax[son] = marked;
-            } else {
+            } else {        
+#ifdef COUNTLINK
                 ndescend++;
+#endif
                 a = father[a];
             }
         } while(bonds[a].size == 1);
@@ -190,6 +196,9 @@ class ctorus {
         while(fatherax[a] == marked) {
             s.push_back(a);
             a = father[a];
+#ifdef COUNTLINK
+            nmarked++;
+#endif
         }
         countbfree += tmp;
         cumbfree[a] += tmp;
@@ -199,7 +208,9 @@ class ctorus {
             assert(cumbfree[a] < 60000);
             cumbfree[s[i]] = 0;
         }
+#ifdef COUNTLINK
         nbacktrace++;
+#endif
         if(maxbfree < cumbfree[a]) maxbfree = cumbfree[a];
         s.clear();
     }

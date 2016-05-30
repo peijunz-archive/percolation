@@ -3,6 +3,7 @@
 # @file collectdata.py
 #
 from numpy import *
+from scipy.optimize import leastsq
 import glob, os
 ## Interval for formatted data
 interval=array([24, 12, 12, 16, 12])
@@ -125,5 +126,25 @@ def linearfit(x, y, name=""):
     if(len(name)):
         savefig(name+'.pdf')
     return k,b,r
-if __name__=="__main__":
-    print(collectdata())
+# Fit the bahavior of density
+def density(L, p):
+    rho0, a, y= p
+    return rho0+a*L**(-y)
+
+def res_density(p, rho, L):
+    """
+    实验数据x, y和拟合函数之间的差，p为拟合需要找到的系数
+    """
+    return  rho - func(L, p)
+# Cache data for data analysing
+def cachedata(fname="data.npy"):
+    if not os.path.isfile(fname):
+        print("Caching data to %s..."%(fname))
+        save(fname, collectdata())
+    print("Cache ready!")  
+cachedata()
+data=load("data.npy")
+#data=collectdata()
+val, err=data
+S=sum(val[0:3], axis=0)
+data[:, :3]/=S
