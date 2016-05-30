@@ -77,7 +77,7 @@ void gendata(int width, int times, double prob) {
     circ.print("Circuit-Total");
     maxclus.print("Max-Clus");
     maxlfree.print("Max-Leaf-Free-Clus");
-    maxbfree.print("Max-Branch-Free-Clus");
+    maxbfree.print("Max-Bridge-Free-Clus");
     maxleaf.print("Max-Leaf-Clus");
 }
 template <bool dense=false>
