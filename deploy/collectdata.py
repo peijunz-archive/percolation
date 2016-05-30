@@ -2,13 +2,14 @@
 ##
 # @file collectdata.py
 #
-from numpy import *
+import numpy as np
+import matplotlib.pyplot as plt
 from scipy.optimize import leastsq
 import glob, os
 ## Interval for formatted data
-interval=array([24, 12, 12, 16, 12])
+interval=np.array([24, 12, 12, 16, 12])
 ## Start/ending position for each block
-pos=cumsum(interval)
+pos=np.cumsum(interval)
 ## Second order statistics
 class stat2:
     def __init__(self, N=0, S=0, S2=0):
@@ -38,10 +39,10 @@ class stat2:
         return self.S2/self.N
 ## Get the standard deviation of the distribution
     def std(self):
-        return sqrt(self.mean2()-self.mean()**2)
+        return np.sqrt(self.mean2()-self.mean()**2)
 ## Get the standard error of the mean
     def err(self):
-        return self.std()/sqrt(self.N)
+        return self.std()/np.sqrt(self.N)
 ## simplest statistical results
     def result(self):
         return [self.mean(), self.err()]
@@ -96,7 +97,7 @@ def getfile(name):
     return [str2pack(k) for k in L]
 ## Unpack list of packs to array
 def toarray(f):
-    return array([d.unpack() for d in f]).transpose([2,1,0])
+    return np.array([d.unpack() for d in f]).transpose([2,1,0])
 ## @brief Collect all data in data/ folder and conver it to array
 def collectdata():
     lf=glob.glob("data/*.dat")
@@ -106,45 +107,86 @@ def collectdata():
         for i in range(len(f)):
             f[i]+=f2[i]
     return toarray(f)
-## Linear fit with plotting
-def linearfit(x, y, name=""):
+## Linear fit
+def linearfit(x, y):
     l=len(x)
     if(l!=len(y)):
         return
     n=len(x)
-    mx=mean(x)
-    my=mean(y)
-    xy=dot(x,y)-n*mx*my
-    xx=dot(x,x)-n*mx*mx
-    yy=dot(y,y)-n*my*my
+    mx=np.mean(x)
+    my=np.mean(y)
+    xy=np.dot(x,y)-n*mx*my
+    xx=np.dot(x,x)-n*mx*mx
+    yy=np.dot(y,y)-n*my*my
     k=xy/xx
     b=my-k*mx
-    r=xy/sqrt(xx*yy)
-    plot(x, y, 'o')
-    plot(x, k*x+b, '-', label="D=%f"%(k))
-    legend(loc="upper left")
-    if(len(name)):
-        savefig(name+'.pdf')
-    return k,b,r
-# Fit the bahavior of density
-def density(L, p):
-    rho0, a, y= p
-    return rho0+a*L**(-y)
-
-def res_density(p, rho, L):
-    """
-    实验数据x, y和拟合函数之间的差，p为拟合需要找到的系数
-    """
-    return  rho - func(L, p)
+    r=xy/np.sqrt(xx*yy)
+    return k,b,r, lambda x:k*x+b
 # Cache data for data analysing
 def cachedata(fname="data.npy"):
     if not os.path.isfile(fname):
         print("Caching data to %s..."%(fname))
-        save(fname, collectdata())
-    print("Cache ready!")  
+        np.save(fname, collectdata())
 cachedata()
-data=load("data.npy")
+L=np.array([16, 23, 32, 45, 64, 90, 128, 181, 256])
+data=np.load("data.npy")
 #data=collectdata()
 val, err=data
-S=sum(val[0:3], axis=0)
+D=-1.8596#47275
+x=L**D
+S=np.sum(val[0:3], axis=0)
 data[:, :3]/=S
+def cpower(p, rho, L):
+    """
+    实验数据x, y和拟合函数之间的差，p为拟合需要找到的系数
+    """
+    rho0, a, y= p
+    if(abs(y)>3):
+        return 100000000
+    return  rho0+a*L**y-rho
+def cexp(p, y, x):
+    k, b, d=p
+    return k*np.log(x+d)+b-y
+def drawdensity():
+    k,b,r,f=linearfit(L**D, val[1])
+    plt.plot(x, f(x), 'k-', x, val[1], 'ro')
+    plt.xlabel(r"$L^{%f}$"%D)
+    plt.ylabel(r"$\rho_j$")
+    plt.grid()
+    plt.savefig("junction.pdf")
+    plt.cla()
+    k,b,r,f=linearfit(L**D, val[2])
+    plt.plot(x, f(x), 'k-', x, val[2], 'bo')
+    plt.xlabel(r"$L^{%f}$"%D)
+    plt.ylabel(r"$\rho_b$")
+    plt.grid()
+    plt.savefig("nonbridge.pdf")
+    plt.cla()
+    plt.plot(x, (val[0]-0.796)/1e-4, 'ro')
+    plt.xlabel(r"$L^{%f}$"%D)
+    plt.ylabel(r"$(\rho_l-0.796)/10^{-4}$")
+    plt.ylim([-1, 1])
+    plt.grid()
+    plt.savefig("leaf.pdf")
+    plt.cla()
+def fitdensity():
+    p=np.array([ 0.05678149, -0.98247447,  -1.85891885])
+    print("枢纽比例", leastsq(cpower, p, args=(val[1], L)))
+    p=np.array([0.14722413,  0.98731717,  -1.86037568])
+    print("非桥比例", leastsq(cpower, p, args=(val[2], L)))
+def fitclus():
+    p=np.array([-19.43377199,   0.97956239,   2.52234679])
+    print("最大丛", leastsq(cpower, p, args=(val[3], L)))
+    p=np.array([-11.62610919,   0.34717929,   2.52239323])
+    print("最大去叶丛", leastsq(cpower, p, args=(val[4], L)))
+    p=np.array([-2.06606095,  0.74730953,  1.8724634 ])
+    print("最大去桥丛", leastsq(cpower, p, args=(val[5], L)))
+def fitleaf():
+    p=np.array([  73.40869749, -150.01109385,    5.29100011])
+    print("最大叶", leastsq(cexp, p , args=(val[-1], L)))
+
+if __name__=="__main__":
+    fitleaf()
+    fitdensity()
+    fitclus()
+    
