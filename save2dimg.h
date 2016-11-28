@@ -1,9 +1,9 @@
 #ifndef SAVEIMG_H
 #define SAVEIMG_H
-#include <opencv/cv.hpp>
+//#include <opencv/cv.hpp>
 #include "zonebond.h"
 #include "ndarray.h"
-using namespace cv;
+//using namespace cv;
 
 /// Default color scheme for bond---geometric progression
 uint8_t geo[4] = {0, 64, 255, 128};

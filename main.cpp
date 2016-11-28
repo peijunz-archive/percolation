@@ -29,13 +29,13 @@ struct means {
     double err() {
         return std() / sqrt(n);
     }
-    void print(const char *name){
+    void print(const char *name) {
         printf("%-24s%-12ld%-12.3e%-16.6e%-12.3e\n",
                name, s1, std(), mean1(), err());
     }
-    static void header(){
-        char line[]="--------";
-        char fmt[]="%-24s%-12s%-12s%-16s%-12s\n";
+    static void header() {
+        char line[] = "--------";
+        char fmt[] = "%-24s%-12s%-12s%-16s%-12s\n";
         printf(fmt, line, line, line, line, line);
         printf(fmt, "Name", "Sum(x)", "Std(x)", "Mean(x)", "Err4Mean");
         printf(fmt, line, line, line, line, line);
@@ -60,7 +60,7 @@ void gendata(int width, int times, double prob) {
     ctorus<D> t(width);
     printf(">>> Dim=%d, width=%d, times=%d, prob=%f\n", D, width, times, prob);
     means::header();
-    for(int i = 0; i < times; i++) {
+    for (int i = 0; i < times; i++) {
         t.setbond(prob);
         t.prune();
         t.dejunct();
@@ -80,12 +80,12 @@ void gendata(int width, int times, double prob) {
     maxbfree.print("Max-Bridge-Free-Clus");
     maxleaf.print("Max-Leaf-Clus");
 }
-template <bool dense=false>
-void savesample(int width, double prob){
+template <bool dense = false>
+void savesample(int width, double prob) {
     ctorus<2> t(width);
     t.setbond(prob);
     savenlist(t, "original.png");
-    if(dense){
+    if (dense) {
         t.connect();
         savenlist(t, "densed.png");
     }
@@ -97,13 +97,14 @@ int main() {
     savesample<true>(24, 0.48);
 //    vector<double> probl={0.1, 0.15, 0.2, 0.22, 0.235, 0.24881182,
 //        0.26, 0.28, 0.33, 0.4, 0.55, 0.7, 0.9, 0.99};
-    vector<int> L={32, 45, 64, 92};
-    int nmin=10;//10000/Day, 7/min, 420/h;
-    for(uint i =0; i<L.size();i++){
-        gendata<2>(L[i], L[L.size()-1]*nmin/L[i], 0.24881182);
-    }
+//    vector<int> L={32, 45, 64, 92};
+//    int nmin=10;//10000/Day, 7/min, 420/h;
+//    for(uint i =0; i<L.size();i++){
+//        gendata<2>(L[i], L[L.size()-1]*nmin/L[i], 0.24881182);
+//    }
 //    for(uint i=0;i<probl.size();i++){
 //        gendata<3>(128, 40, probl[i]);
 //    }
+    gendata<2>(8, 10000000, 0.5);
     return 0;
 }

@@ -9,29 +9,21 @@ enum bondtype : uint8_t {
     nonbrg = 3, ///< A bond without which the cluster is still connected
     marked = 64 ///< Mark to replace axis if a point is backtraced.
 };
+constexpr uint upper_size=8;
+constexpr uint lower_size=1;
+constexpr int least_size(uint n){
+    return (1<=n && n<=upper_size)?(n>lower_size?least_size(n-n/2)*2:lower_size):0;
+}
 
-template<int N, bool C = true>
-/// Int of at least given size
-struct least {
-    typedef typename least < N + (N < 9 && N > 1), (N < 9 && N > 1) >::_int _int;
-};
 template<int N>
-struct least<N, false> {
-    typedef void _int;
-};
+/// Int of at least given size N
+struct least {typedef typename least <least_size(N)>::_int _int;};
 
-template<bool C>
-struct least<2, C> {
-    typedef int16_t _int;
-};
-template<bool C>
-struct least<4, C> {
-    typedef int32_t _int;
-};
-template<bool C>
-struct least<8, C> {
-    typedef int64_t _int;
-};
+template<> struct least<0> {typedef void _int;};
+template<> struct least<1> {typedef int8_t _int;};
+template<> struct least<2> {typedef int16_t _int;};
+template<> struct least<4> {typedef int32_t _int;};
+template<> struct least<8> {typedef int64_t _int;};
 
 template<int D>
 /**
