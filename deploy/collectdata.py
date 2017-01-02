@@ -134,7 +134,8 @@ data=np.load("data.npy")
 val, err=data
 D=-1.8596#47275
 Dh=2.52237
-Dl=1.87246
+#Dh=2.522439323
+Dl=1.8734634
 x=L**D
 S=np.sum(val[0:3], axis=0)
 data[:, :3]/=S
@@ -179,19 +180,23 @@ def drawdensity():
     plt.cla()
 def drawmax():
     tmp=val[4]*L**(-Dh)
+    er=err[4]*L**(-Dh)
     k,b,r,f=linearfit(x, tmp)
     print(b)
-    plt.plot(x, f(x), 'k-', x, tmp, 'bo')
+    plt.plot(x, f(x), 'k-')
+    plt.errorbar(x, tmp, er, fmt='bo')
     plt.xlabel(r"$L^{%.4f}$"%D)
     plt.ylabel(r"$L^{%.5f}C_{lf}$"%Dh)
     plt.grid()
     plt.savefig("maxl.pdf")
     plt.cla()
 
-    tmp=val[4]*L**(-Dh)
+    tmp=val[5]*L**(-Dl)
+    er=err[5]*L**(-Dl)
     k,b,r,f=linearfit(x, tmp)
     print(b)
-    plt.plot(x, f(x), 'k-', x, tmp, 'bo')
+    plt.plot(x, f(x), 'k-')
+    plt.errorbar(x, tmp, er, fmt='bo')
     plt.xlabel(r"$L^{%.4f}$"%D)
     plt.ylabel(r"$L^{%.5f}C_{bf}$"%Dl)
     plt.grid()
@@ -216,9 +221,11 @@ def fitleaf():
 def drawleaf():
     x=np.log(L+5.291)
     a=val[-1]
+    er=err[-1]
     k,b,r,f=linearfit(x, a)
     print(k, b, r)
-    plt.plot(x, f(x), 'k-', x, a, 'o')
+    plt.plot(x, f(x), 'k-')
+    plt.errorbar(x, a, er, fmt='o')
     plt.xlabel(r"$\ln(L+5.291)$")
     plt.ylabel(r"$C_{l}$")
     plt.grid()
@@ -226,10 +233,10 @@ def drawleaf():
     plt.cla()
 
 if __name__=="__main__":
-    #fitleaf()
+    fitleaf()
     #fitdensity()
-    #fitclus()
-    drawmax()
-    drawmax()
+    fitclus()
+    #drawmax()
+    #drawleaf()
     
     

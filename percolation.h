@@ -44,11 +44,12 @@ class ctorus {
     ndarray<nbond<D>, D> bonds;     ///< Rember the bonds by means of list
     ctorus(uint width) {
         bonds = ndarray<nbond<D>, D>(width);
-        cumleaf = ndarray<uint16_t, D>(bonds);
-        cumbfree = ndarray<uint32_t, D>(bonds);
-        time = ndarray<uint16_t, D>(bonds);
-        father = ndarray<uint, D>(bonds);
-        fatherax = ndarray<int8_t, D>(bonds);
+        auto shp=bonds.shape();
+        cumleaf = ndarray<uint16_t, D>(shp);
+        cumbfree = ndarray<uint32_t, D>(shp);
+        time = ndarray<uint16_t, D>(shp);
+        father = ndarray<uint, D>(shp);
+        fatherax = ndarray<int8_t, D>(shp);
     }
     /**
      * @brief set bonds and initialize the variables
