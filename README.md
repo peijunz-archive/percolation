@@ -36,3 +36,5 @@
 + 统计每个无枝丛的大小，进而得到Branch-free的大小，以及最大无枝丛
 + 统计每个无桥丛的大小，进而得到Bridge-free的大小，以及最大无桥丛
 
+# Doxygen doc
+http://peijun.me/percolation
